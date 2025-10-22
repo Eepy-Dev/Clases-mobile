@@ -1,5 +1,12 @@
-# Clases-mobile
+#Clases-mobile
 Repo para clases de desarrollo movil
+
+Añadiéndome como colaboradora
+# Proyecto App Móvil
+
+App desarrollada en Android Studio por Paz Molina y Jordan Villegas.
+Incluye navegación, interfaz base y estructura MVVM.
+=======
 
 ##no tocar hasta el final donde dice pull request##
 
@@ -20,4 +27,5 @@ git status para ver los cambios hechos
 #Sube la nueva rama al repositorio remoto
 
 git push origin Nombre rama
+
 
