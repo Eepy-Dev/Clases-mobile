@@ -1,7 +1,7 @@
 # Clases-mobile
 Repo para clases de desarrollo movil
 
-
+##no tocar hasta el final donde dice pull request##
 
 git checkout main < para irte a la main
 
