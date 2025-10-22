@@ -1,6 +1,6 @@
-# Clases-mobile
+#Clases-mobile
 Repo para clases de desarrollo movil
-<<<<<<< HEAD
+
 Añadiéndome como colaboradora
 # Proyecto App Móvil
 
@@ -28,4 +28,4 @@ git status para ver los cambios hechos
 
 git push origin Nombre rama
 
->>>>>>> 5c49cf072b052724b5eb9d66749cec7c0bde5403
+
