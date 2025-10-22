@@ -1,15 +1,47 @@
+# Android / Kotlin
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
+.gradle/
+local.properties
+/.idea/
+/.idea/*
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+/.gradle
+**/build/
+*/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Gradle
+gradle-app.setting
+gradle-wrapper.jar
+
+# Keystore
+*.jks
+*.keystore
+
+# Logs
+*.log
+
+# JetBrains
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/usage.statistics.xml
+/.idea/dictionaries
+/.idea/assetWizardSettings.xml
+
+# Android Studio specific
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+
+# Kotlin/Java
+out/
+*.class
+
+# Misc
+/.vscode/
