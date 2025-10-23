@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/cream">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Consulta de Productos"
+        android:textSize="24sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="24dp"
+        android:background="@color/chocolate_medium" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/editTextBusqueda"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:hint="Buscar por ID o nombre"
+            android:background="@drawable/edit_text_background"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/chocolate_dark"
+            android:textColorHint="@color/chocolate_medium" />
+
+        <Button
+            android:id="@+id/buttonBuscar"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:text="Buscar"
+            android:background="@drawable/button_background"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:padding="16dp" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listViewResultados"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp" />
+
+    <Button
+        android:id="@+id/buttonVolver"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Volver"
+        android:background="@drawable/button_background"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_margin="16dp" />
+
+</LinearLayout>
