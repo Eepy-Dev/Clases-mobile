@@ -60,8 +60,10 @@ class IngresoActivity : ComponentActivity() {
             val bitmap = result.data?.extras?.get("data") as? Bitmap
             bitmap?.let {
                 val rutaFoto = guardarImagen(it)
-                // Aquí necesitaríamos pasar la imagen al composable
-                // Por simplicidad, manejaremos esto en el composable
+                if (rutaFoto.isNotEmpty()) {
+                    // Notificar al composable que la imagen se guardó
+                    productoViewModel.setImagenCapturada(bitmap, rutaFoto)
+                }
             }
         }
     }
@@ -114,7 +116,7 @@ class IngresoActivity : ComponentActivity() {
     }
     
     private fun solicitarPermisosYCamara() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) 
             != PackageManager.PERMISSION_GRANTED) {
             // Solicitar permiso de cámara
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -164,6 +166,8 @@ fun IngresoScreen(
     var imagenBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var productoSeleccionado by remember { mutableStateOf<Producto?>(null) }
     var mensaje by remember { mutableStateOf("") }
+    var imagenCapturada by remember { mutableStateOf<Bitmap?>(null) }
+    var rutaImagenCapturada by remember { mutableStateOf<String?>(null) }
     
     DisposableEffect(Unit) {
         val productoObserver = androidx.lifecycle.Observer<Producto?> { producto ->
@@ -172,11 +176,23 @@ fun IngresoScreen(
         val mensajeObserver = androidx.lifecycle.Observer<String> { msg ->
             mensaje = msg
         }
+        val imagenObserver = androidx.lifecycle.Observer<Pair<Bitmap?, String?>> { (bitmap, ruta) ->
+            imagenCapturada = bitmap
+            rutaImagenCapturada = ruta
+            if (bitmap != null) {
+                imagenBitmap = bitmap
+            }
+            if (ruta != null) {
+                rutaFoto = ruta
+            }
+        }
         productoViewModel.productoSeleccionado.observeForever(productoObserver)
         productoViewModel.mensaje.observeForever(mensajeObserver)
+        productoViewModel.imagenCapturada.observeForever(imagenObserver)
         onDispose {
             productoViewModel.productoSeleccionado.removeObserver(productoObserver)
             productoViewModel.mensaje.removeObserver(mensajeObserver)
+            productoViewModel.imagenCapturada.removeObserver(imagenObserver)
         }
     }
     
@@ -361,10 +377,23 @@ fun IngresoScreen(
             // Botón Guardar
             Button(
                 onClick = {
-                    guardarProducto(
+                    val exito = guardarProducto(
                         id, nombre, descripcion, precio, cantidad, rutaFoto,
                         esModoEdicion, productoViewModel, onMensaje
                     )
+                    if (exito) {
+                        // Limpiar campos después de guardar exitosamente
+                        id = ""
+                        nombre = ""
+                        descripcion = ""
+                        precio = ""
+                        cantidad = ""
+                        rutaFoto = null
+                        imagenBitmap = null
+                        imagenCapturada = null
+                        rutaImagenCapturada = null
+                        onMensaje("Producto guardado exitosamente")
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -408,27 +437,27 @@ private fun guardarProducto(
     esModoEdicion: Boolean,
     productoViewModel: ProductoViewModel,
     onMensaje: (String) -> Unit
-) {
+): Boolean {
         // Validaciones
     if (id.trim().isEmpty()) {
         onMensaje("El ID es obligatorio")
-            return
+            return false
         }
     if (nombre.trim().isEmpty()) {
         onMensaje("El nombre es obligatorio")
-            return
+            return false
         }
     if (descripcion.trim().isEmpty()) {
         onMensaje("La descripción es obligatoria")
-            return
+            return false
         }
     if (precio.trim().isEmpty()) {
         onMensaje("El precio es obligatorio")
-            return
+            return false
         }
     if (cantidad.trim().isEmpty()) {
         onMensaje("La cantidad es obligatoria")
-            return
+            return false
         }
         
     val precioDouble = precio.toDoubleOrNull()
@@ -436,11 +465,11 @@ private fun guardarProducto(
         
     if (precioDouble == null || precioDouble <= 0) {
         onMensaje("El precio debe ser un número válido mayor a 0")
-            return
+            return false
         }
     if (cantidadInt == null || cantidadInt < 0) {
         onMensaje("La cantidad debe ser un número válido mayor o igual a 0")
-            return
+            return false
         }
         
         val producto = Producto(
@@ -457,6 +486,8 @@ private fun guardarProducto(
         } else {
             productoViewModel.insertarProducto(producto)
         }
+        
+        return true
 }
 
 private fun cargarImagen(ruta: String): Bitmap? {
