@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="chocolate_dark">#8B4513</color>
+    <color name="chocolate_light">#D2691E</color>
+    <color name="chocolate_medium">#A0522D</color>
+    <color name="cream">#FFF8DC</color>
+    <color name="cream_dark">#F5DEB3</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">AppMovil</string>
+    <style name="Theme.AppMovil" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/chocolate_medium</item>
+        <item name="android:colorPrimaryDark">@color/chocolate_dark</item>
+        <item name="android:colorAccent">@color/chocolate_light</item>
+        <item name="android:windowBackground">@color/cream</item>
+    </style>
+</resources>
