@@ -1,6 +1,7 @@
 package com.example.appmovil
 
 import android.app.Application
+import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +23,9 @@ class ProductoViewModel(application: Application) : AndroidViewModel(application
     
     private val _mensaje = MutableLiveData<String>()
     val mensaje: LiveData<String> = _mensaje
+    
+    private val _imagenCapturada = MutableLiveData<Pair<Bitmap?, String?>>()
+    val imagenCapturada: LiveData<Pair<Bitmap?, String?>> = _imagenCapturada
     
     fun insertarProducto(producto: Producto) {
         viewModelScope.launch {
@@ -80,5 +84,9 @@ class ProductoViewModel(application: Application) : AndroidViewModel(application
     
     fun limpiarMensaje() {
         _mensaje.value = ""
+    }
+    
+    fun setImagenCapturada(bitmap: Bitmap, ruta: String) {
+        _imagenCapturada.value = Pair(bitmap, ruta)
     }
 }
