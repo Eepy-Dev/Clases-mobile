@@ -11,8 +11,6 @@ drawable button_background
 drawable edit_text_background
 drawable ic_launcher_background
 drawable ic_launcher_foreground
-drawable item_producto_background
-drawable logo
 id buttonBuscar
 id buttonConsulta
 id buttonGuardar
@@ -32,15 +30,11 @@ id editTextUsuario
 id imageViewFoto
 id listViewProductos
 id listViewResultados
-id textViewCantidad
-id textViewNombre
-id textViewPrecio
 layout activity_consulta
 layout activity_home
 layout activity_ingreso
 layout activity_login
 layout activity_productos
-layout item_producto
 mipmap ic_launcher
 mipmap ic_launcher_round
 string app_name

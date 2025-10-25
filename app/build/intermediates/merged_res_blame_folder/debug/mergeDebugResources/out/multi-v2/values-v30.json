@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.appmovil.app-mergeDebugResources-58:/values-v30/values-v30.xml",
+            "outputFile": "com.example.appmovil.app-mergeDebugResources-55:/values-v30/values-v30.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\jorda\\.gradle\\caches\\8.13\\transforms\\0bcb1f5a294d6a45678a49d139f6bc1b\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "source": "C:\\Users\\jorda\\.gradle\\caches\\8.13\\transforms\\67be3047264edbc76ad59099c3a285bd\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
