@@ -1,31 +1,113 @@
-#Clases-mobile
-Repo para clases de desarrollo movil
-Añadiendo una rama
+#  App Móvil - Sistema de Gestión de Inventario
 
-Añadiéndome como colaboradora
-# Proyecto App Móvil
+##  Descripción del Proyecto
 
-App desarrollada en Android Studio por Paz Molina y Jordan Villegas.
-Incluye navegación, interfaz base y estructura MVVM.
+Esta aplicación móvil Android es un **sistema completo de gestión de inventario** desarrollado con kotlin.
+ Permite gestionar productos desde el registro hasta la consulta y hasta compartir informacion a whatsapp
 
-##no tocar hasta el final donde dice pull request##
+###  Características Principales
 
-git checkout main < para irte a la main
+- **Sistema de autenticación** con credenciales 
+- **Gestión completa de productos** (agregar, editar, eliminar)
+- **Búsqueda inteligente** de productos por nombre
+- **Integración con cámara** para fotos de productos
+- **Compartir información** vía WhatsApp
+- **Almacenamiento local** con base de datos SQLite
+- **Interfaz moderna** con Material Design
 
-Crea y cambia a la nueva rama
+---
 
-git checkout -b Nombre rama
+##  Tecnologías Utilizadas
 
-git add . para añadir todos los cambios
+### **¿Por qué elegimos estas tecnologías?**
 
-Haz un commit con los cambios
+####  **Jetpack Compose**
+```kotlin
+@Composable
+fun LoginScreen() {
+    // UI declarativa y moderna
+}
+```
+**¿Por qué Compose?**
+- **Código más limpio**: 50% menos código que XML tradicional
+- **Desarrollo más rápido**: UI declarativa, menos bugs
+- **Mejor rendimiento**: Solo redibuja lo que cambia
+- **Futuro de Android**: Tecnología oficial de Google
 
-git commit -m "Cambios que hice "
+####  **Room Database**
+```kotlin
+@Entity(tableName = "productos")
+data class Producto(
+    @PrimaryKey val id: String,
+    val nombre: String
+)
+```
+**¿Por qué Room?**
+- **Type-safe**: Sin errores de SQL en tiempo de compilación
+- **Integración perfecta**: Funciona nativamente con LiveData
+- **Fácil mantenimiento**: Migraciones automáticas
+- **Mejor que SQLite directo**: Menos código, más funcionalidades
 
-git status para ver los cambios hechos
+#### **Arquitectura MVVM**
+```
+UI (Compose) ↔ ViewModel ↔ Room Database
+```
+**¿Por qué MVVM?**
+- **Separación clara**: UI, lógica y datos separados
+- **Fácil testing**: Cada capa se prueba independientemente
+- **Mantenimiento**: Código organizado y escalable
+- **Patrón estándar**: Recomendado por Google
 
-#Sube la nueva rama al repositorio remoto
+####  **LiveData**
+```kotlin
+val productos: LiveData<List<Producto>> = productoDao.getAllProductos()
+```
+**¿Por qué LiveData?**
+- **Reactividad automática**: UI se actualiza sola
+- **Manejo de ciclo de vida**: Previene crashes
+- **Sin memory leaks**: Se limpia automáticamente
+- **Integración perfecta**: Con Room y ViewModel
 
-git push origin Nombre rama
+---
+
+##  Funcionalidades de la Aplicación
+
+###  **Sistema de Autenticación**
+- Login con credenciales
+- Navegación automática tras autenticación exitosa
+
+### 🏠 **Pantalla Principal**
+- Menú intuitivo con 3 opciones
+- Navegación clara entre secciones
 
 
+###  **Gestión de Productos**
+- **Lista completa**: Visualización de todos los productos
+- **Eliminación segura**: Confirmación antes de eliminar
+- **Actualización automática**: Lista se actualiza
+
+###  **Sistema de Búsqueda**
+- **Búsqueda inteligente**: Filtrado por nombre de producto o el ID
+- **Resultados en tiempo real**: Actualización 
+- **Navegación a detalles**: ver información completa
+
+###  **Registro de Productos**
+- **Formulario completo**: ID, nombre, descripción, precio, cantidad
+- **Integración con cámara**: Fotos de productos
+- **Validación de datos**: Verificación antes de guardar
+- **Modo edición**: Modificar productos 
+
+###  **Detalles de Producto**
+- **Información completa**: Todos los datos del producto
+- **Visualización de fotos**: Imágenes guardadas
+- **Compartir vía WhatsApp**: Envío de información 
+
+---
+
+
+### **Material Design 3**
+- **Componentes modernos**: Botones, campos de texto, tarjetas
+- **Animaciones fluidas**: Transiciones 
+- **Responsive**: Se adapta a diferentes tamaños de pantalla
+
+---
