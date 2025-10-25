@@ -76,7 +76,7 @@ val productos: LiveData<List<Producto>> = productoDao.getAllProductos()
 - Login con credenciales
 - Navegación automática tras autenticación exitosa
 
-### 🏠 **Pantalla Principal**
+###  **Pantalla Principal**
 - Menú intuitivo con 3 opciones
 - Navegación clara entre secciones
 
