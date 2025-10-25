@@ -49,6 +49,12 @@
             android:exported="false"
             android:label="Ingreso"
             android:theme="@style/Theme.AppMovil" />
+            
+        <activity
+            android:name=".DetalleProductoActivity"
+            android:exported="false"
+            android:label="Detalle Producto"
+            android:theme="@style/Theme.AppMovil" />
     </application>
 
 </manifest>

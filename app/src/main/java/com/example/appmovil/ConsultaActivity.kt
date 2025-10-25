@@ -3,106 +3,203 @@ package com.example.appmovil
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ListView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import com.example.appmovil.ui.theme.AppMovilTheme
+import com.example.appmovil.ui.theme.ChocolateDark
+import com.example.appmovil.ui.theme.ChocolateMedium
+import com.example.appmovil.ui.theme.Cream
 
-class ConsultaActivity : AppCompatActivity() {
+class ConsultaActivity : ComponentActivity() {
     
-    private lateinit var editTextBusqueda: EditText
-    private lateinit var buttonBuscar: Button
-    private lateinit var listViewResultados: ListView
-    private lateinit var buttonVolver: Button
     private lateinit var productoViewModel: ProductoViewModel
-    private lateinit var productoAdapter: ProductoAdapter
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_consulta)
+        enableEdgeToEdge()
         
-        initViews()
         setupViewModel()
-        setupAdapter()
-        setupClickListeners()
-        observeViewModel()
-    }
-    
-    private fun initViews() {
-        editTextBusqueda = findViewById(R.id.editTextBusqueda)
-        buttonBuscar = findViewById(R.id.buttonBuscar)
-        listViewResultados = findViewById(R.id.listViewResultados)
-        buttonVolver = findViewById(R.id.buttonVolver)
+        
+        setContent {
+            AppMovilTheme {
+                ConsultaScreen(
+                    onVolverClick = { finish() },
+                    onProductoClick = { producto ->
+                        mostrarDetallesProducto(producto)
+                    },
+                    onMensaje = { mensaje ->
+                        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+                    },
+                    productoViewModel = productoViewModel
+                )
+            }
+        }
     }
     
     private fun setupViewModel() {
         productoViewModel = ViewModelProvider(this, AndroidViewModelFactory.getInstance(application))[ProductoViewModel::class.java]
     }
     
-    private fun setupAdapter() {
-        productoAdapter = ProductoAdapter(this, emptyList())
-        listViewResultados.adapter = productoAdapter
+    private fun mostrarDetallesProducto(producto: Producto) {
+        val intent = Intent(this, DetalleProductoActivity::class.java)
+        intent.putExtra("producto", producto)
+        startActivity(intent)
     }
+}
+
+@Composable
+fun ConsultaScreen(
+    onVolverClick: () -> Unit,
+    onProductoClick: (Producto) -> Unit,
+    onMensaje: (String) -> Unit,
+    productoViewModel: ProductoViewModel
+) {
+    var terminoBusqueda by remember { mutableStateOf("") }
+    var productosFiltrados by remember { mutableStateOf<List<Producto>>(emptyList()) }
+    var mensaje by remember { mutableStateOf("") }
     
-    private fun setupClickListeners() {
-        buttonBuscar.setOnClickListener {
-            val termino = editTextBusqueda.text.toString().trim()
-            if (termino.isNotEmpty()) {
-                productoViewModel.buscarProductos(termino)
-            } else {
-                Toast.makeText(this, "Ingresa un término de búsqueda", Toast.LENGTH_SHORT).show()
-            }
+    DisposableEffect(Unit) {
+        val productosObserver = androidx.lifecycle.Observer<List<Producto>> { productos ->
+            productosFiltrados = productos
         }
-        
-        buttonVolver.setOnClickListener {
-            finish()
+        val mensajeObserver = androidx.lifecycle.Observer<String> { msg ->
+            mensaje = msg
         }
-        
-        listViewResultados.setOnItemClickListener { _, _, position, _ ->
-            val producto = productoAdapter.getItem(position)
-            mostrarDetallesYCompartir(producto)
-        }
-    }
-    
-    private fun observeViewModel() {
-        productoViewModel.productosFiltrados.observe(this) { productos ->
-            productoAdapter.actualizarProductos(productos)
-        }
-        
-        productoViewModel.mensaje.observe(this) { mensaje ->
-            if (mensaje.isNotEmpty()) {
-                Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-                productoViewModel.limpiarMensaje()
-            }
+        productoViewModel.productosFiltrados.observeForever(productosObserver)
+        productoViewModel.mensaje.observeForever(mensajeObserver)
+        onDispose {
+            productoViewModel.productosFiltrados.removeObserver(productosObserver)
+            productoViewModel.mensaje.removeObserver(mensajeObserver)
         }
     }
     
-    private fun mostrarDetallesYCompartir(producto: Producto) {
-        val mensaje = """
-            🍫 Detalles del Producto:
+    LaunchedEffect(mensaje) {
+        if (mensaje.isNotEmpty()) {
+            onMensaje(mensaje)
+            productoViewModel.limpiarMensaje()
+        }
+    }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Cream)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Título
+            Text(
+                text = "Consulta de Productos",
+                fontSize = 24.sp,
+                color = ChocolateDark,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(ChocolateMedium)
+                    .padding(24.dp)
+            )
             
-            📋 ID: ${producto.id}
-            🏷️ Nombre: ${producto.nombre}
-            📝 Descripción: ${producto.descripcion}
-            💰 Precio: $${producto.precio}
-            📦 Stock: ${producto.cantidad}
-        """.trimIndent()
+            // Campo de búsqueda y botón
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = terminoBusqueda,
+                    onValueChange = { terminoBusqueda = it },
+                    label = { Text("Buscar productos") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = ChocolateMedium,
+                        unfocusedBorderColor = ChocolateMedium,
+                        focusedLabelColor = ChocolateDark,
+                        unfocusedLabelColor = ChocolateDark,
+                        focusedTextColor = ChocolateDark,
+                        unfocusedTextColor = ChocolateDark
+                    )
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                Button(
+                    onClick = {
+                        if (terminoBusqueda.trim().isNotEmpty()) {
+                            productoViewModel.buscarProductos(terminoBusqueda.trim())
+                        } else {
+                            onMensaje("Ingresa un término de búsqueda")
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ChocolateMedium
+                    )
+                ) {
+                    Text(
+                        text = "Buscar",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            
+            // Lista de resultados
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(productosFiltrados) { producto ->
+                    ProductoItem(
+                        producto = producto,
+                        onClick = { onProductoClick(producto) }
+                    )
+                }
+            }
+        }
         
-        try {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.setPackage("com.whatsapp")
-            intent.putExtra(Intent.EXTRA_TEXT, mensaje)
-            startActivity(intent)
-        } catch (e: Exception) {
-            // Si WhatsApp no está instalado, usar cualquier app de mensajería
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.putExtra(Intent.EXTRA_TEXT, mensaje)
-            startActivity(Intent.createChooser(intent, "Compartir producto"))
+        // Botón Volver fijo en la parte inferior
+        Button(
+            onClick = onVolverClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.BottomCenter),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = ChocolateMedium
+            )
+        ) {
+            Text(
+                text = "Volver",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
