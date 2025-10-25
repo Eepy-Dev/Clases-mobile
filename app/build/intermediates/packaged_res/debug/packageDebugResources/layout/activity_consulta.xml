@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
-            android:hint="Buscar producto por ID o nombre"
+            android:hint="Buscar por ID o nombre"
             android:background="@drawable/edit_text_background"
             android:padding="16dp"
             android:layout_marginEnd="8dp"
@@ -65,5 +65,3 @@
         android:layout_margin="16dp" />
 
 </LinearLayout>
-
-

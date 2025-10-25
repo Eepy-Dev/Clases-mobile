@@ -26,7 +26,7 @@
             android:id="@+id/editTextId"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Ingrese el ID del producto"
+            android:hint="ID del Producto"
             android:background="@drawable/edit_text_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
@@ -37,7 +37,7 @@
             android:id="@+id/editTextNombre"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Ingrese el nombre del producto"
+            android:hint="Nombre del Producto"
             android:background="@drawable/edit_text_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
@@ -48,7 +48,7 @@
             android:id="@+id/editTextDescripcion"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:hint="Ingrese la descripción del producto"
+            android:hint="Descripción"
             android:background="@drawable/edit_text_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
@@ -60,7 +60,7 @@
             android:id="@+id/editTextPrecio"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Ingrese el precio del producto"
+            android:hint="Precio"
             android:inputType="numberDecimal"
             android:background="@drawable/edit_text_background"
             android:padding="16dp"
@@ -72,7 +72,7 @@
             android:id="@+id/editTextCantidad"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Ingrese la cantidad en stock"
+            android:hint="Cantidad"
             android:inputType="number"
             android:background="@drawable/edit_text_background"
             android:padding="16dp"
@@ -123,5 +123,3 @@
     </LinearLayout>
 
 </ScrollView>
-
-

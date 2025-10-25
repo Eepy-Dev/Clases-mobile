@@ -7,13 +7,6 @@
     android:gravity="center"
     android:background="@color/cream">
 
-    <ImageView
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:src="@drawable/logo"
-        android:layout_marginBottom="24dp"
-        android:scaleType="centerCrop" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +20,7 @@
         android:id="@+id/editTextUsuario"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:hint="Ingrese su usuario"
+        android:hint="Usuario"
         android:background="@drawable/edit_text_background"
         android:padding="16dp"
         android:layout_marginBottom="16dp"
@@ -38,7 +31,7 @@
         android:id="@+id/editTextContrasena"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:hint="Ingrese su contraseña"
+        android:hint="Contraseña"
         android:inputType="textPassword"
         android:background="@drawable/edit_text_background"
         android:padding="16dp"
@@ -57,5 +50,3 @@
         android:textStyle="bold" />
 
 </LinearLayout>
-
-

@@ -8,10 +8,12 @@
     <color name="cream_dark">#F5DEB3</color>
     <color name="white">#FFFFFFFF</color>
     <string name="app_name">AppMovil</string>
-    <style name="Theme.AppMovil" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:colorPrimary">@color/chocolate_medium</item>
-        <item name="android:colorPrimaryDark">@color/chocolate_dark</item>
-        <item name="android:colorAccent">@color/chocolate_light</item>
+    <style name="Theme.AppMovil" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/chocolate_medium</item>
+        <item name="colorPrimaryDark">@color/chocolate_dark</item>
+        <item name="colorAccent">@color/chocolate_light</item>
         <item name="android:windowBackground">@color/cream</item>
+        <item name="android:textColorPrimary">@color/chocolate_dark</item>
+        <item name="android:textColorSecondary">@color/chocolate_medium</item>
     </style>
 </resources>
