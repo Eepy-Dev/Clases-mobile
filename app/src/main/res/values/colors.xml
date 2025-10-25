@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chocolate_dark">#8B4513</color>
+    <color name="chocolate_medium">#A0522D</color>
+    <color name="chocolate_light">#D2691E</color>
+    <color name="cream">#FFF8DC</color>
+    <color name="cream_dark">#F5DEB3</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
