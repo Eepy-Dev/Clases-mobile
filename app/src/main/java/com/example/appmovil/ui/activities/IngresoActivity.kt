@@ -38,12 +38,32 @@ class IngresoActivity : ComponentActivity() {
             bitmap?.let {
                 val rutaFoto = guardarImagen(it)
                 if (rutaFoto.isNotEmpty()) {
-                    // Notificar al composable que la imagen se guardó
                     productoViewModel.setImagenCapturada(bitmap, rutaFoto)
                 }
             }
         }
     }
+    
+    private val galeriaLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data
+            uri?.let {
+                try {
+                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, it)
+                    val rutaFoto = guardarImagen(bitmap)
+                    if (rutaFoto.isNotEmpty()) {
+                        productoViewModel.setImagenCapturada(bitmap, rutaFoto)
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Error al cargar imagen: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    private var mostrarDialogoSeleccionImagen: (() -> Unit)? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +79,8 @@ class IngresoActivity : ComponentActivity() {
                     onMensaje = { mensaje ->
                         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
                     },
-                    onTomarFoto = {
-                        solicitarPermisosYCamara()
+                    onSeleccionarImagen = {
+                        mostrarDialogoSeleccionarImagen()
                     },
                     productoViewModel = productoViewModel,
                     esModoEdicion = esModoEdicion,
@@ -75,6 +95,15 @@ class IngresoActivity : ComponentActivity() {
     }
     
     private fun verificarModoEdicion() {
+        // Verificar si viene un producto del catálogo online
+        val producto = intent.getSerializableExtra("producto") as? Producto
+        if (producto != null) {
+            esModoEdicion = false // No es edición, es un nuevo producto desde catálogo
+            productoEditando = producto
+            return
+        }
+        
+        // Verificar si es modo edición normal
         val productoId = intent.getStringExtra("producto_id")
         if (productoId != null) {
             esModoEdicion = true
@@ -92,10 +121,22 @@ class IngresoActivity : ComponentActivity() {
         }
     }
     
+    private fun mostrarDialogoSeleccionarImagen() {
+        val opciones = arrayOf("Cámara", "Galería")
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Seleccionar imagen")
+            .setItems(opciones) { _, cual ->
+                when (cual) {
+                    0 -> solicitarPermisosYCamara()
+                    1 -> abrirGaleria()
+                }
+            }
+            .show()
+    }
+    
     private fun solicitarPermisosYCamara() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) 
             != PackageManager.PERMISSION_GRANTED) {
-            // Solicitar permiso de cámara
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         } else {
             abrirCamara()
@@ -109,6 +150,11 @@ class IngresoActivity : ComponentActivity() {
         } else {
             Toast.makeText(this, "No se puede abrir la cámara", Toast.LENGTH_SHORT).show()
         }
+    }
+    
+    private fun abrirGaleria() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galeriaLauncher.launch(intent)
     }
     
     private fun guardarImagen(bitmap: Bitmap): String {

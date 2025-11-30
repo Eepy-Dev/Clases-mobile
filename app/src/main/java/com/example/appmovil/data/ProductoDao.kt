@@ -9,6 +9,9 @@ interface ProductoDao {
     @Query("SELECT * FROM productos ORDER BY nombre ASC")
     fun getAllProductos(): LiveData<List<Producto>>
     
+    @Query("SELECT * FROM productos ORDER BY nombre ASC")
+    suspend fun getAllProductosSuspend(): List<Producto>
+    
     @Query("SELECT * FROM productos WHERE id = :id")
     suspend fun getProductoById(id: String): Producto?
     

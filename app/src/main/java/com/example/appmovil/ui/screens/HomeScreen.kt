@@ -28,6 +28,7 @@ fun HomeScreen(
     onConsultaClick: () -> Unit,
     onIngresoClick: () -> Unit,
     onHistorialClick: () -> Unit,
+    onProductosExternosClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     // Animaciones
@@ -206,6 +207,38 @@ fun HomeScreen(
                 ) {
                     Text(
                         text = "Historial",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Botón Productos API con animacion
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(600, delayMillis = 1200)
+                ) + fadeIn(
+                    animationSpec = tween(600, delayMillis = 1200)
+                ),
+                exit = ExitTransition.None
+            ) {
+                Button(
+                    onClick = onProductosExternosClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ChocolateMedium
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "Catálogo Online",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold

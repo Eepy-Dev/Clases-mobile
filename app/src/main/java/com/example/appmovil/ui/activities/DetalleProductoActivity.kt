@@ -51,6 +51,9 @@ class DetalleProductoActivity : ComponentActivity() {
                         productoViewModel.eliminarProducto(producto)
                         finish()
                     },
+                    onMensaje = { mensaje ->
+                        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+                    },
                     productoViewModel = productoViewModel
                 )
             }

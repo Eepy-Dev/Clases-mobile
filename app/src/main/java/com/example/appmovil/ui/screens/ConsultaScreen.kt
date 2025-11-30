@@ -38,6 +38,8 @@ fun ConsultaScreen(
     var allProductos by remember { mutableStateOf<List<Producto>>(emptyList()) }
     var mensaje by remember { mutableStateOf("") }
     var mostrarResultadosBusqueda by remember { mutableStateOf(false) }
+    var mostrarDialogoSincronizar by remember { mutableStateOf(false) }
+    var cargandoSincronizacion by remember { mutableStateOf(false) }
     
     DisposableEffect(Unit) {
         val productosObserver = androidx.lifecycle.Observer<List<Producto>> { productos ->
@@ -50,19 +52,28 @@ fun ConsultaScreen(
         val mensajeObserver = androidx.lifecycle.Observer<String> { msg ->
             mensaje = msg
         }
+        val cargandoObserver = androidx.lifecycle.Observer<Boolean> { isLoading ->
+            cargandoSincronizacion = isLoading
+        }
         productoViewModel.productosFiltrados.observeForever(productosObserver)
         productoViewModel.allProductos.observeForever(allProductosObserver)
         productoViewModel.mensaje.observeForever(mensajeObserver)
+        productoViewModel.cargandoProductosExternos.observeForever(cargandoObserver)
         onDispose {
             productoViewModel.productosFiltrados.removeObserver(productosObserver)
             productoViewModel.allProductos.removeObserver(allProductosObserver)
             productoViewModel.mensaje.removeObserver(mensajeObserver)
+            productoViewModel.cargandoProductosExternos.removeObserver(cargandoObserver)
         }
     }
     
     LaunchedEffect(mensaje) {
         if (mensaje.isNotEmpty()) {
-            onMensaje(mensaje)
+            if (mensaje.contains("Productos nuevos agregados", ignoreCase = true)) {
+                onMensaje("Productos nuevos agregados al servidor")
+            } else {
+                onMensaje(mensaje)
+            }
             productoViewModel.limpiarMensaje()
         }
     }
@@ -111,6 +122,42 @@ fun ConsultaScreen(
                         .background(ChocolateMedium)
                         .padding(24.dp)
                 )
+            }
+            
+            // Botón Sincronizar con Servidor
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(
+                    animationSpec = tween(400, delayMillis = 200)
+                ),
+                exit = ExitTransition.None
+            ) {
+                Button(
+                    onClick = { mostrarDialogoSincronizar = true },
+                    enabled = !cargandoSincronizacion,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ChocolateMedium
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    if (cargandoSincronizacion) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Sincronizar con el Servidor",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
             
             // Campo de búsqueda y botón con animacion
@@ -242,6 +289,48 @@ fun ConsultaScreen(
                 }
             }
         }
+    }
+    
+    // Dialog de confirmación para sincronización masiva
+    if (mostrarDialogoSincronizar) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoSincronizar = false },
+            title = {
+                Text(
+                    text = "Sincronizar con el Servidor",
+                    fontWeight = FontWeight.Bold,
+                    color = ChocolateDark
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Estás seguro de que quieres sincronizar todos los productos locales con el servidor?\n\nSolo se agregarán los productos que no existan en el servidor. Los productos que ya existen serán omitidos.",
+                    color = ChocolateDark
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mostrarDialogoSincronizar = false
+                        productoViewModel.sincronizarTodosLosProductosAlServidor()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ChocolateMedium
+                    )
+                ) {
+                    Text("Sincronizar", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { mostrarDialogoSincronizar = false }
+                ) {
+                    Text("Cancelar", color = ChocolateMedium)
+                }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp)
+        )
     }
 }
 

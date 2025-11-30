@@ -10,7 +10,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.appmovil.data.Producto
 import com.example.appmovil.ui.theme.ChocolateDark
 import com.example.appmovil.ui.theme.ChocolateMedium
@@ -35,7 +38,7 @@ import com.example.appmovil.util.ValidationResult
 fun IngresoScreen(
     onVolverClick: () -> Unit,
     onMensaje: (String) -> Unit,
-    onTomarFoto: () -> Unit,
+    onSeleccionarImagen: () -> Unit,
     productoViewModel: ProductoViewModel,
     esModoEdicion: Boolean,
     productoEditando: Producto?
@@ -84,9 +87,10 @@ fun IngresoScreen(
         }
     }
     
-    // Cargar datos del producto si está en modo edición
-    LaunchedEffect(productoSeleccionado) {
-        productoSeleccionado?.let { producto ->
+    // Cargar datos del producto si está en modo edición o viene del catálogo
+    LaunchedEffect(productoSeleccionado, productoEditando) {
+        val productoACargar = productoSeleccionado ?: productoEditando
+        productoACargar?.let { producto ->
             id = producto.id
             nombre = producto.nombre
             descripcion = producto.descripcion
@@ -94,9 +98,16 @@ fun IngresoScreen(
             cantidad = producto.cantidad.toString()
             rutaFoto = producto.foto
             if (producto.foto != null) {
-                val bitmap = ImageUtils.cargarImagen(producto.foto)
-                if (bitmap != null) {
-                    imagenBitmap = bitmap
+                // Si es una URL (del catálogo), cargar con Coil o similar
+                if (producto.foto.startsWith("http")) {
+                    // Es una URL, se puede cargar después si es necesario
+                    rutaFoto = producto.foto
+                } else {
+                    // Es una ruta local
+                    val bitmap = ImageUtils.cargarImagen(producto.foto)
+                    if (bitmap != null) {
+                        imagenBitmap = bitmap
+                    }
                 }
             }
         }
@@ -141,12 +152,15 @@ fun IngresoScreen(
                 OutlinedTextField(
                     value = id,
                     onValueChange = { 
-                        id = it
-                        // Limpiar error cuando el usuario empieza a escribir
-                        erroresValidacion = erroresValidacion.filterKeys { it != "id" }
+                        if (!esModoEdicion) { // Solo permitir editar si NO está en modo edición
+                            id = it
+                            // Limpiar error cuando el usuario empieza a escribir
+                            erroresValidacion = erroresValidacion.filterKeys { it != "id" }
+                        }
                     },
                     label = { Text("ID del Producto") },
                     singleLine = true,
+                    enabled = !esModoEdicion, // Deshabilitar en modo edición
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
@@ -159,7 +173,10 @@ fun IngresoScreen(
                         unfocusedLabelColor = ChocolateDark,
                         errorLabelColor = Color.Red,
                         focusedTextColor = ChocolateDark,
-                        unfocusedTextColor = ChocolateDark
+                        unfocusedTextColor = ChocolateDark,
+                        disabledTextColor = ChocolateDark.copy(alpha = 0.6f),
+                        disabledLabelColor = ChocolateDark.copy(alpha = 0.6f),
+                        disabledBorderColor = ChocolateMedium.copy(alpha = 0.5f)
                     )
                 )
                 // Mensaje de error debajo del campo
@@ -321,40 +338,98 @@ fun IngresoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(CreamDark)
+                    .background(CreamDark, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
             ) {
-                if (imagenBitmap != null) {
-                    Image(
-                        bitmap = imagenBitmap!!.asImageBitmap(),
-                        contentDescription = "Foto del producto",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = android.R.drawable.ic_menu_camera),
-                        contentDescription = "Tomar foto",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    )
+                when {
+                    imagenBitmap != null -> {
+                        Image(
+                            bitmap = imagenBitmap!!.asImageBitmap(),
+                            contentDescription = "Foto del producto",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    rutaFoto != null && rutaFoto!!.startsWith("http") -> {
+                        // Imagen desde URL (del catálogo web)
+                        Image(
+                            painter = rememberAsyncImagePainter(rutaFoto),
+                            contentDescription = "Imagen del producto",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    else -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "📷",
+                                fontSize = 48.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Sin imagen",
+                                color = ChocolateMedium.copy(alpha = 0.6f),
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
                 }
             }
             
-            // Botón Tomar Foto
-            Button(
-                onClick = onTomarFoto,
+            // Botones de imagen en una fila armoniosa
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ChocolateMedium
-                )
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = "Tomar Foto",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Button(
+                    onClick = onSeleccionarImagen,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ChocolateMedium
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "📷 Seleccionar Imagen",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                
+                // Botón para eliminar imagen si existe
+                if (imagenBitmap != null || (rutaFoto != null && rutaFoto!!.startsWith("http"))) {
+                    Button(
+                        onClick = {
+                            imagenBitmap = null
+                            rutaFoto = null
+                            rutaImagenCapturada = null
+                            imagenCapturada = null
+                        },
+                        modifier = Modifier
+                            .height(56.dp)
+                            .width(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Red.copy(alpha = 0.8f)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "✕",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
             
             // Botón Guardar

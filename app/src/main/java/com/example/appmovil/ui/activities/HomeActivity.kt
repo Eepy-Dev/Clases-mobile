@@ -39,6 +39,11 @@ class HomeActivity : ComponentActivity() {
                         startActivity(intent)
                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                     },
+                    onProductosExternosClick = {
+                        val intent = Intent(this, ProductosExternosActivity::class.java)
+                        startActivity(intent)
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+                    },
                     onLogoutClick = {
                         val intent = Intent(this, LoginActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

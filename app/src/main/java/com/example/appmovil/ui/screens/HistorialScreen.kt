@@ -165,7 +165,7 @@ fun HistorialScreen(
                 }
             }
             
-            // Lista de movimientos
+            // Lista de movimientos con padding inferior para el botón
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(
@@ -176,7 +176,7 @@ fun HistorialScreen(
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(16.dp),
+                        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 80.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (movimientosFiltrados.isEmpty()) {
@@ -205,31 +205,35 @@ fun HistorialScreen(
                     }
                 }
             }
-            
-            // Botón Volver
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(
-                    animationSpec = tween(400, delayMillis = 600)
+        }
+        
+        // Botón Volver fijo en la parte inferior
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = fadeIn(
+                animationSpec = tween(400, delayMillis = 600)
+            ),
+            exit = ExitTransition.None,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+        ) {
+            Button(
+                onClick = onVolverClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ChocolateMedium
                 ),
-                exit = ExitTransition.None
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Button(
-                    onClick = onVolverClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ChocolateMedium
-                    )
-                ) {
-                    Text(
-                        text = "Volver",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Text(
+                    text = "Volver",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
