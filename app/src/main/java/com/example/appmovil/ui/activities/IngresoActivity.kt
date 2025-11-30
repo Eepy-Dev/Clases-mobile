@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import com.example.appmovil.R
 import com.example.appmovil.data.Producto
 import com.example.appmovil.ui.screens.IngresoScreen
 import com.example.appmovil.ui.theme.AppMovilTheme
@@ -121,6 +122,11 @@ class IngresoActivity : ComponentActivity() {
             e.printStackTrace()
             return ""
         }
+    }
+    
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
     }
 }
 
