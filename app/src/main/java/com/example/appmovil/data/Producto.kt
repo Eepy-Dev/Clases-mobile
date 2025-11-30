@@ -1,4 +1,4 @@
-package com.example.appmovil
+package com.example.appmovil.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -14,3 +14,4 @@ data class Producto(
     val cantidad: Int,
     val foto: String? = null // Ruta de la foto o null si no tiene
 ) : Serializable
+

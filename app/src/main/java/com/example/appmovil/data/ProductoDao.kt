@@ -1,4 +1,4 @@
-package com.example.appmovil
+package com.example.appmovil.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
@@ -27,3 +27,4 @@ interface ProductoDao {
     @Query("DELETE FROM productos WHERE id = :id")
     suspend fun eliminarProductoPorId(id: String)
 }
+

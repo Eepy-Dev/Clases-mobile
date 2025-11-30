@@ -1,4 +1,4 @@
-package com.example.appmovil
+package com.example.appmovil.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,3 +32,4 @@ class LoginViewModel : ViewModel() {
         }
     }
 }
+

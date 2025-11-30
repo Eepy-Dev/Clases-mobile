@@ -1,4 +1,4 @@
-package com.example.appmovil
+package com.example.appmovil.data
 
 import android.content.Context
 import androidx.room.Database
@@ -31,3 +31,4 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
+
