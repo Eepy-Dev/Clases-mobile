@@ -3,19 +3,16 @@ package com.example.appmovil.ui.screens
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +28,7 @@ fun ConsultaScreen(
     onVolverClick: () -> Unit,
     onProductoClick: (Producto) -> Unit,
     onMensaje: (String) -> Unit,
+    onEliminarPorId: (String) -> Unit,
     productoViewModel: ProductoViewModel
 ) {
     var terminoBusqueda by remember { mutableStateOf("") }
@@ -38,6 +36,7 @@ fun ConsultaScreen(
     var allProductos by remember { mutableStateOf<List<Producto>>(emptyList()) }
     var mensaje by remember { mutableStateOf("") }
     var mostrarResultadosBusqueda by remember { mutableStateOf(false) }
+    var idParaEliminar by remember { mutableStateOf("") }
     
     DisposableEffect(Unit) {
         val productosObserver = androidx.lifecycle.Observer<List<Producto>> { productos ->
@@ -170,6 +169,81 @@ fun ConsultaScreen(
                 }
             }
             
+            // Sección eliminar por ID
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(600, delayMillis = 400)
+                ) + fadeIn(
+                    animationSpec = tween(600, delayMillis = 400)
+                ),
+                exit = ExitTransition.None
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Eliminar por ID:",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ChocolateDark
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = idParaEliminar,
+                                onValueChange = { idParaEliminar = it },
+                                label = { Text("ID del producto") },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = ChocolateMedium,
+                                    unfocusedBorderColor = ChocolateMedium,
+                                    focusedLabelColor = ChocolateDark,
+                                    unfocusedLabelColor = ChocolateDark,
+                                    focusedTextColor = ChocolateDark,
+                                    unfocusedTextColor = ChocolateDark
+                                )
+                            )
+                            Button(
+                                onClick = {
+                                    if (idParaEliminar.trim().isNotEmpty()) {
+                                        onEliminarPorId(idParaEliminar.trim())
+                                        idParaEliminar = ""
+                                    } else {
+                                        onMensaje("Ingresa un ID válido")
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red
+                                )
+                            ) {
+                                Text(
+                                    text = "Eliminar",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            
             // Lista de productos (inicial o resultados de búsqueda)
             AnimatedVisibility(
                 visible = isVisible,
@@ -242,4 +316,3 @@ fun ConsultaScreen(
         }
     }
 }
-
