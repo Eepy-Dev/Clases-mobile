@@ -3,6 +3,7 @@ package com.pazapp.products.service;
 import com.pazapp.products.model.Producto;
 import com.pazapp.products.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,15 +19,15 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    public Optional<Producto> findById(Long id) {
+    public Optional<Producto> findById(@NonNull Long id) {
         return productoRepository.findById(id);
     }
 
-    public Producto save(Producto producto) {
+    public Producto save(@NonNull Producto producto) {
         return productoRepository.save(producto);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(@NonNull Long id) {
         productoRepository.deleteById(id);
     }
 
@@ -34,7 +35,7 @@ public class ProductoService {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
-    public Producto registrarSalida(Long id, Integer cantidad) {
+    public Producto registrarSalida(@NonNull Long id, Integer cantidad) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
