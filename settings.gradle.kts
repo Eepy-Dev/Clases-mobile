@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AppMovil"
 include(":app")
- 
+include(":backend:products-service")
