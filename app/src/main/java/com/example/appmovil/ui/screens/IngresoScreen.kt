@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -49,6 +50,8 @@ fun IngresoScreen(
     var mensaje by remember { mutableStateOf("") }
     var imagenCapturada by remember { mutableStateOf<Bitmap?>(null) }
     var rutaImagenCapturada by remember { mutableStateOf<String?>(null) }
+    
+    val scope = rememberCoroutineScope()
     
     DisposableEffect(Unit) {
         val productoObserver = androidx.lifecycle.Observer<Producto?> { producto ->
@@ -123,7 +126,7 @@ fun IngresoScreen(
         
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Campo ID
             OutlinedTextField(
@@ -131,7 +134,9 @@ fun IngresoScreen(
                 onValueChange = { id = it },
                 label = { Text("ID del Producto") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ChocolateMedium,
                     unfocusedBorderColor = ChocolateMedium,
@@ -148,7 +153,9 @@ fun IngresoScreen(
                 onValueChange = { nombre = it },
                 label = { Text("Nombre del Producto") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ChocolateMedium,
                     unfocusedBorderColor = ChocolateMedium,
@@ -166,7 +173,8 @@ fun IngresoScreen(
                 label = { Text("Descripción") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp),
+                    .height(100.dp)
+                    .padding(vertical = 4.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ChocolateMedium,
                     unfocusedBorderColor = ChocolateMedium,
@@ -185,7 +193,9 @@ fun IngresoScreen(
                 label = { Text("Precio") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ChocolateMedium,
                     unfocusedBorderColor = ChocolateMedium,
@@ -203,7 +213,9 @@ fun IngresoScreen(
                 label = { Text("Cantidad") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = ChocolateMedium,
                     unfocusedBorderColor = ChocolateMedium,
@@ -258,22 +270,24 @@ fun IngresoScreen(
             // Botón Guardar
             Button(
                 onClick = {
-                    val exito = ProductoValidator.guardarProducto(
-                        id, nombre, descripcion, precio, cantidad, rutaFoto,
-                        esModoEdicion, productoViewModel, onMensaje
-                    )
-                    if (exito) {
-                        // Limpiar campos después de guardar exitosamente
-                        id = ""
-                        nombre = ""
-                        descripcion = ""
-                        precio = ""
-                        cantidad = ""
-                        rutaFoto = null
-                        imagenBitmap = null
-                        imagenCapturada = null
-                        rutaImagenCapturada = null
-                        onMensaje("Producto guardado exitosamente")
+                    scope.launch {
+                        val exito = ProductoValidator.guardarProducto(
+                            id, nombre, descripcion, precio, cantidad, rutaFoto,
+                            esModoEdicion, productoViewModel, onMensaje
+                        )
+                        if (exito) {
+                            // Limpiar campos después de guardar exitosamente
+                            id = ""
+                            nombre = ""
+                            descripcion = ""
+                            precio = ""
+                            cantidad = ""
+                            rutaFoto = null
+                            imagenBitmap = null
+                            imagenCapturada = null
+                            rutaImagenCapturada = null
+                            // El mensaje de éxito ya se muestra desde el ViewModel
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

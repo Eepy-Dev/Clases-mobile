@@ -39,9 +39,9 @@
             android:theme="@style/Theme.AppMovil" />
             
         <activity
-            android:name=".ui.activities.ProductosActivity"
+            android:name=".ui.activities.SalidaActivity"
             android:exported="false"
-            android:label="Productos"
+            android:label="Salida"
             android:theme="@style/Theme.AppMovil" />
             
         <activity
@@ -60,6 +60,12 @@
             android:name=".ui.activities.DetalleProductoActivity"
             android:exported="false"
             android:label="Detalle Producto"
+            android:theme="@style/Theme.AppMovil" />
+            
+        <activity
+            android:name=".ui.activities.HistorialActivity"
+            android:exported="false"
+            android:label="Historial"
             android:theme="@style/Theme.AppMovil" />
     </application>
 

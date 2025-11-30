@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import com.example.appmovil.R
 import com.example.appmovil.data.Producto
 import com.example.appmovil.ui.screens.ConsultaScreen
 import com.example.appmovil.ui.theme.AppMovilTheme
@@ -43,10 +44,16 @@ class ConsultaActivity : ComponentActivity() {
         productoViewModel = ViewModelProvider(this, AndroidViewModelFactory.getInstance(application))[ProductoViewModel::class.java]
     }
     
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+    }
+    
     private fun mostrarDetallesProducto(producto: Producto) {
         val intent = Intent(this, DetalleProductoActivity::class.java)
         intent.putExtra("producto", producto)
         startActivity(intent)
+        overridePendingTransition(R.anim.scale_in, R.anim.fade_out)
     }
 }
 

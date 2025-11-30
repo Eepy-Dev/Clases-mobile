@@ -4,7 +4,7 @@ import com.example.appmovil.data.Producto
 import com.example.appmovil.ui.viewmodel.ProductoViewModel
 
 object ProductoValidator {
-    fun guardarProducto(
+    suspend fun guardarProducto(
         id: String,
         nombre: String,
         descripcion: String,
@@ -47,6 +47,15 @@ object ProductoValidator {
         if (cantidadInt == null || cantidadInt < 0) {
             onMensaje("La cantidad debe ser un número válido mayor o igual a 0")
             return false
+        }
+        
+        // Validar ID único solo al crear (no en edición)
+        if (!esModoEdicion) {
+            val idExiste = productoViewModel.existeProductoConId(id.trim())
+            if (idExiste) {
+                onMensaje("El ID '${id.trim()}' ya existe en el inventario. Por favor, usa otro ID.")
+                return false
+            }
         }
         
         val producto = Producto(

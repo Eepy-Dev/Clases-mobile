@@ -1,5 +1,7 @@
 package com.example.appmovil.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -61,97 +63,155 @@ fun LoginScreen(
         }
     }
     
+    // Animaciones
+    var isVisible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        isVisible = true
+    }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Cream)
-            .padding(32.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo
-            Image(
-                painter = painterResource(id = R.drawable.logos),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .width(254.dp)
-                    .height(217.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(48.dp))
-            
-            // Título de bienvenida
-            Text(
-                text = "Bienvenidos!",
-                color = ChocolateDark,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(11.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(48.dp))
-            
-            // Campo de usuario
-            OutlinedTextField(
-                value = usuario,
-                onValueChange = { usuario = it },
-                label = { Text("Usuario") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ChocolateLight,
-                    unfocusedBorderColor = ChocolateLight,
-                    focusedLabelColor = ChocolateDark,
-                    unfocusedLabelColor = ChocolateDark,
-                    focusedTextColor = ChocolateDark,
-                    unfocusedTextColor = ChocolateDark
+            // Logo con animacion de fade in y scale
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(
+                    animationSpec = tween(600, delayMillis = 100)
+                ) + scaleIn(
+                    initialScale = 0.8f,
+                    animationSpec = tween(600, delayMillis = 100)
+                ),
+                exit = ExitTransition.None
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logos),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .width(254.dp)
+                        .height(217.dp)
                 )
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Campo de contraseña
-            OutlinedTextField(
-                value = contrasena,
-                onValueChange = { contrasena = it },
-                label = { Text("Contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ChocolateLight,
-                    unfocusedBorderColor = ChocolateLight,
-                    focusedLabelColor = ChocolateDark,
-                    unfocusedLabelColor = ChocolateDark,
-                    focusedTextColor = ChocolateDark,
-                    unfocusedTextColor = ChocolateDark
-                )
-            )
+            }
             
             Spacer(modifier = Modifier.height(32.dp))
             
-            // Botón de login
-            Button(
-                onClick = {
-                    loginViewModel.validarLogin(usuario.trim(), contrasena.trim())
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = com.example.appmovil.ui.theme.ChocolateMedium
-                )
+            // Título de bienvenida con animacion de slide
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { -it },
+                    animationSpec = tween(400, delayMillis = 300)
+                ) + fadeIn(
+                    animationSpec = tween(400, delayMillis = 300)
+                ),
+                exit = ExitTransition.None
             ) {
                 Text(
-                    text = "Iniciar Sesión",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "Bienvenidos!",
+                    color = ChocolateDark,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(11.dp)
                 )
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Campos con animacion secuencial
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { it / 2 },
+                    animationSpec = tween(400, delayMillis = 500)
+                ) + fadeIn(
+                    animationSpec = tween(400, delayMillis = 500)
+                ),
+                exit = ExitTransition.None
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Campo de usuario
+                    OutlinedTextField(
+                        value = usuario,
+                        onValueChange = { usuario = it },
+                        label = { Text("Usuario") },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = ChocolateLight,
+                            unfocusedBorderColor = ChocolateLight,
+                            focusedLabelColor = ChocolateDark,
+                            unfocusedLabelColor = ChocolateDark,
+                            focusedTextColor = ChocolateDark,
+                            unfocusedTextColor = ChocolateDark
+                        )
+                    )
+                    
+                    // Campo de contraseña
+                    OutlinedTextField(
+                        value = contrasena,
+                        onValueChange = { contrasena = it },
+                        label = { Text("Contraseña") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = ChocolateLight,
+                            unfocusedBorderColor = ChocolateLight,
+                            focusedLabelColor = ChocolateDark,
+                            unfocusedLabelColor = ChocolateDark,
+                            focusedTextColor = ChocolateDark,
+                            unfocusedTextColor = ChocolateDark
+                        )
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Botón de login con animacion
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(
+                    animationSpec = tween(400, delayMillis = 700)
+                ) + scaleIn(
+                    initialScale = 0.9f,
+                    animationSpec = tween(400, delayMillis = 700)
+                ),
+                exit = ExitTransition.None
+            ) {
+                Button(
+                    onClick = {
+                        loginViewModel.validarLogin(usuario.trim(), contrasena.trim())
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = com.example.appmovil.ui.theme.ChocolateMedium
+                    )
+                ) {
+                    Text(
+                        text = "Iniciar Sesión",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

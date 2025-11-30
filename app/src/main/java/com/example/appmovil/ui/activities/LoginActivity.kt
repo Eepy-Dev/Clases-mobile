@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import com.example.appmovil.R
 import com.example.appmovil.ui.screens.LoginScreen
 import com.example.appmovil.ui.theme.AppMovilTheme
 import com.example.appmovil.ui.viewmodel.LoginViewModel
@@ -28,6 +29,7 @@ class LoginActivity : ComponentActivity() {
                     onLoginSuccess = {
                         val intent = Intent(this, HomeActivity::class.java)
                         startActivity(intent)
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                         finish()
                     },
                     onError = { mensaje ->
@@ -37,6 +39,11 @@ class LoginActivity : ComponentActivity() {
                 )
             }
         }
+    }
+    
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
     }
     
     private fun setupViewModel() {
