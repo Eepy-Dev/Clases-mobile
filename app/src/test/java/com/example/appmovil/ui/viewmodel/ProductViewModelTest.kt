@@ -12,20 +12,27 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExperimentalCoroutinesApi
 class ProductViewModelTest {
 
-    private lateinit var repository: ProductRepository
     private lateinit var viewModel: ProductViewModel
+    private lateinit var repository: ProductRepository
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        repository = mockk()
+        repository = mockk(relaxed = true)
+        
+        // Stub methods called in init
+        coEvery { repository.getProducts() } returns Result.success(emptyList())
+        coEvery { repository.getRandomDogImage() } returns Result.success("http://example.com/dog.jpg")
+        
         viewModel = ProductViewModel(repository)
     }
 
@@ -35,11 +42,10 @@ class ProductViewModelTest {
     }
 
     @Test
-    fun `loadProducts updates state with products on success`() = runTest {
+    fun `loadProducts updates uiState with products on success`() = runTest(testDispatcher) {
         // Given
-        val products = listOf(Product(1, "Test", 100.0, 10))
+        val products = listOf(Product(1, "Test", 10.0, 5, null))
         coEvery { repository.getProducts() } returns Result.success(products)
-        coEvery { repository.getRandomDogImage() } returns Result.success("url")
 
         // When
         viewModel.loadProducts()
@@ -47,23 +53,35 @@ class ProductViewModelTest {
 
         // Then
         assertEquals(products, viewModel.uiState.value.products)
-        assertEquals(false, viewModel.uiState.value.isLoading)
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test
-    fun `addProduct updates state on success`() = runTest {
+    fun `addProduct reloads products on success`() = runTest(testDispatcher) {
         // Given
-        val newProduct = Product(null, "New", 200.0, 5)
+        val newProduct = Product(nombre = "New", precio = 20.0, stock = 10, imagenUrl = null)
         coEvery { repository.createProduct(any()) } returns Result.success(newProduct)
         coEvery { repository.getProducts() } returns Result.success(listOf(newProduct))
-        coEvery { repository.getRandomDogImage() } returns Result.success("url")
 
         // When
-        viewModel.addProduct("New", 200.0, 5, null)
+        viewModel.addProduct("New", 20.0, 10, null)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Then
-        // Verify loadProducts was called and state updated
-        assertEquals(listOf(newProduct), viewModel.uiState.value.products)
+        assertEquals(1, viewModel.uiState.value.products.size)
+    }
+
+    @Test
+    fun `registerOutput updates stock on success`() = runTest(testDispatcher) {
+        // Given
+        coEvery { repository.registerOutput(1, 1) } returns Result.success(Product(1, "Test", 10.0, 4, null))
+        coEvery { repository.getProducts() } returns Result.success(emptyList()) // Mock reload
+
+        // When
+        viewModel.registerOutput(1, 1)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 }

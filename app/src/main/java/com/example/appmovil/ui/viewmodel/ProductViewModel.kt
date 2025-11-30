@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appmovil.data.repository.ProductRepository
 import com.example.appmovil.domain.model.Product
+import com.example.appmovil.domain.model.InventoryMovement
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 
 data class ProductUiState(
     val products: List<Product> = emptyList(),
+    val inventoryMovements: List<InventoryMovement> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val selectedProduct: Product? = null,
@@ -35,6 +37,18 @@ class ProductViewModel(
             val result = repository.getProducts()
             result.onSuccess { products ->
                 _uiState.value = _uiState.value.copy(products = products, isLoading = false)
+            }.onFailure { e ->
+                _uiState.value = _uiState.value.copy(error = e.message, isLoading = false)
+            }
+        }
+    }
+
+    fun loadInventoryMovements() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            val result = repository.getInventoryMovements()
+            result.onSuccess { movements ->
+                _uiState.value = _uiState.value.copy(inventoryMovements = movements, isLoading = false)
             }.onFailure { e ->
                 _uiState.value = _uiState.value.copy(error = e.message, isLoading = false)
             }
@@ -120,3 +134,4 @@ class ProductViewModel(
         _uiState.value = _uiState.value.copy(error = null)
     }
 }
+

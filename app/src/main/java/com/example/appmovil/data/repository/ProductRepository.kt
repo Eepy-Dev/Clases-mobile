@@ -2,14 +2,20 @@ package com.example.appmovil.data.repository
 
 import com.example.appmovil.data.remote.ProductApiService
 import com.example.appmovil.data.remote.ExternalApiService
+import com.example.appmovil.data.remote.InventoryApiService
+import com.example.appmovil.data.remote.UserApiService
 import com.example.appmovil.data.remote.RetrofitClient
 import com.example.appmovil.domain.model.Product
+import com.example.appmovil.domain.model.User
+import com.example.appmovil.domain.model.InventoryMovement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 class ProductRepository(
     private val api: ProductApiService = RetrofitClient.productApiService,
+    private val inventoryApi: InventoryApiService = RetrofitClient.inventoryApiService,
+    private val userApi: UserApiService = RetrofitClient.userApiService,
     private val externalApi: ExternalApiService = RetrofitClient.externalApiService
 ) {
 
@@ -23,6 +29,7 @@ class ProductRepository(
         }
     }
 
+    // Product Methods
     suspend fun getProducts(): Result<List<Product>> = withContext(Dispatchers.IO) {
         try {
             handle(api.getProducts())
@@ -82,6 +89,41 @@ class ProductRepository(
         }
     }
 
+    // Inventory Methods
+    suspend fun getInventoryMovements(): Result<List<InventoryMovement>> = withContext(Dispatchers.IO) {
+        try {
+            handle(inventoryApi.getAllMovements())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createInventoryMovement(movement: InventoryMovement): Result<InventoryMovement> = withContext(Dispatchers.IO) {
+        try {
+            handle(inventoryApi.createMovement(movement))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // User Methods
+    suspend fun login(username: String, password: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val credentials = mapOf("username" to username, "password" to password)
+            handle(userApi.login(credentials))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createUser(user: User): Result<User> = withContext(Dispatchers.IO) {
+        try {
+            handle(userApi.createUser(user))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getRandomDogImage(): Result<String> = withContext(Dispatchers.IO) {
         try {
             val resp = externalApi.getRandomDogImage()
@@ -91,3 +133,4 @@ class ProductRepository(
         }
     }
 }
+
