@@ -84,12 +84,44 @@ class ProductoViewModel(application: Application) : AndroidViewModel(application
         }
     }
     
+    suspend fun getProductoByIdSync(id: String): Producto? {
+        return try {
+            productoDao.getProductoById(id)
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
     fun limpiarMensaje() {
         _mensaje.value = ""
     }
     
     fun setImagenCapturada(bitmap: Bitmap, ruta: String) {
         _imagenCapturada.value = Pair(bitmap, ruta)
+    }
+    
+    fun registrarSalida(productoId: String, cantidad: Int) {
+        viewModelScope.launch {
+            try {
+                val producto = productoDao.getProductoById(productoId)
+                if (producto == null) {
+                    _mensaje.value = "Producto no encontrado"
+                    return@launch
+                }
+                
+                val nuevaCantidad = producto.cantidad - cantidad
+                if (nuevaCantidad < 0) {
+                    _mensaje.value = "No hay suficiente stock. Stock actual: ${producto.cantidad}"
+                    return@launch
+                }
+                
+                val productoActualizado = producto.copy(cantidad = nuevaCantidad)
+                productoDao.actualizarProducto(productoActualizado)
+                _mensaje.value = "Salida registrada exitosamente. Nuevo stock: $nuevaCantidad"
+            } catch (e: Exception) {
+                _mensaje.value = "Error al registrar salida: ${e.message}"
+            }
+        }
     }
 }
 

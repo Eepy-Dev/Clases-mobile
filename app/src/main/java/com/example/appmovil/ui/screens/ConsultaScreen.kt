@@ -1,5 +1,7 @@
 package com.example.appmovil.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,11 +31,13 @@ fun ConsultaScreen(
     onVolverClick: () -> Unit,
     onProductoClick: (Producto) -> Unit,
     onMensaje: (String) -> Unit,
+    onEliminarPorId: (String) -> Unit,
     productoViewModel: ProductoViewModel
 ) {
     var terminoBusqueda by remember { mutableStateOf("") }
     var productosFiltrados by remember { mutableStateOf<List<Producto>>(emptyList()) }
     var mensaje by remember { mutableStateOf("") }
+    var idParaEliminar by remember { mutableStateOf("") }
     
     DisposableEffect(Unit) {
         val productosObserver = androidx.lifecycle.Observer<List<Producto>> { productos ->
@@ -57,6 +61,13 @@ fun ConsultaScreen(
         }
     }
     
+    // Animaciones
+    var isVisible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        isVisible = true
+    }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -65,76 +76,184 @@ fun ConsultaScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Título
-            Text(
-                text = "Consulta de Productos",
-                fontSize = 24.sp,
-                color = ChocolateDark,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(ChocolateMedium)
-                    .padding(24.dp)
-            )
-            
-            // Campo de búsqueda y botón
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // Título con animacion
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { -it },
+                    animationSpec = tween(600, delayMillis = 100)
+                ) + fadeIn(
+                    animationSpec = tween(600, delayMillis = 100)
+                ),
+                exit = ExitTransition.None
             ) {
-                OutlinedTextField(
-                    value = terminoBusqueda,
-                    onValueChange = { terminoBusqueda = it },
-                    label = { Text("Buscar productos") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = ChocolateMedium,
-                        unfocusedBorderColor = ChocolateMedium,
-                        focusedLabelColor = ChocolateDark,
-                        unfocusedLabelColor = ChocolateDark,
-                        focusedTextColor = ChocolateDark,
-                        unfocusedTextColor = ChocolateDark
-                    )
+                Text(
+                    text = "Consulta de Productos",
+                    fontSize = 24.sp,
+                    color = ChocolateDark,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(ChocolateMedium)
+                        .padding(24.dp)
                 )
-                
-                Spacer(modifier = Modifier.width(8.dp))
-                
-                Button(
-                    onClick = {
-                        if (terminoBusqueda.trim().isNotEmpty()) {
-                            productoViewModel.buscarProductos(terminoBusqueda.trim())
-                        } else {
-                            onMensaje("Ingresa un término de búsqueda")
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ChocolateMedium
-                    )
+            }
+            
+            // Campo de búsqueda y botón con animacion
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(600, delayMillis = 300)
+                ) + fadeIn(
+                    animationSpec = tween(600, delayMillis = 300)
+                ),
+                exit = ExitTransition.None
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Buscar",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
+                    OutlinedTextField(
+                        value = terminoBusqueda,
+                        onValueChange = { terminoBusqueda = it },
+                        label = { Text("Buscar productos") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = ChocolateMedium,
+                            unfocusedBorderColor = ChocolateMedium,
+                            focusedLabelColor = ChocolateDark,
+                            unfocusedLabelColor = ChocolateDark,
+                            focusedTextColor = ChocolateDark,
+                            unfocusedTextColor = ChocolateDark
+                        )
                     )
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Button(
+                        onClick = {
+                            if (terminoBusqueda.trim().isNotEmpty()) {
+                                productoViewModel.buscarProductos(terminoBusqueda.trim())
+                            } else {
+                                onMensaje("Ingresa un término de búsqueda")
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ChocolateMedium
+                        )
+                    ) {
+                        Text(
+                            text = "Buscar",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
             
-            // Lista de resultados
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            // Sección eliminar por ID
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(600, delayMillis = 400)
+                ) + fadeIn(
+                    animationSpec = tween(600, delayMillis = 400)
+                ),
+                exit = ExitTransition.None
             ) {
-                items(productosFiltrados) { producto ->
-                    ProductoItem(
-                        producto = producto,
-                        onClick = { onProductoClick(producto) }
-                    )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Eliminar por ID:",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ChocolateDark
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = idParaEliminar,
+                                onValueChange = { idParaEliminar = it },
+                                label = { Text("ID del producto") },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = ChocolateMedium,
+                                    unfocusedBorderColor = ChocolateMedium,
+                                    focusedLabelColor = ChocolateDark,
+                                    unfocusedLabelColor = ChocolateDark,
+                                    focusedTextColor = ChocolateDark,
+                                    unfocusedTextColor = ChocolateDark
+                                )
+                            )
+                            Button(
+                                onClick = {
+                                    if (idParaEliminar.trim().isNotEmpty()) {
+                                        onEliminarPorId(idParaEliminar.trim())
+                                        idParaEliminar = ""
+                                    } else {
+                                        onMensaje("Ingresa un ID válido")
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red
+                                )
+                            ) {
+                                Text(
+                                    text = "Eliminar",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Lista de resultados con animacion
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(
+                    animationSpec = tween(600, delayMillis = 600)
+                ),
+                exit = ExitTransition.None
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = productosFiltrados,
+                        key = { producto -> producto.id }
+                    ) { producto ->
+                        ProductoItem(
+                            producto = producto,
+                            onClick = { onProductoClick(producto) }
+                        )
+                    }
                 }
             }
         }
