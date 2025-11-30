@@ -29,6 +29,7 @@ import com.example.appmovil.ui.theme.CreamDark
 import com.example.appmovil.ui.viewmodel.ProductoViewModel
 import com.example.appmovil.util.ImageUtils
 import com.example.appmovil.util.ProductoValidator
+import com.example.appmovil.util.ValidationResult
 
 @Composable
 fun IngresoScreen(
@@ -50,6 +51,9 @@ fun IngresoScreen(
     var mensaje by remember { mutableStateOf("") }
     var imagenCapturada by remember { mutableStateOf<Bitmap?>(null) }
     var rutaImagenCapturada by remember { mutableStateOf<String?>(null) }
+    
+    // Errores de validación por campo
+    var erroresValidacion by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     
     val scope = rememberCoroutineScope()
     
@@ -98,9 +102,13 @@ fun IngresoScreen(
         }
     }
     
+    // Solo mostrar mensajes de éxito del ViewModel (no errores de validación)
     LaunchedEffect(mensaje) {
-        if (mensaje.isNotEmpty()) {
+        if (mensaje.isNotEmpty() && mensaje.contains("exitosamente", ignoreCase = true)) {
             onMensaje(mensaje)
+            productoViewModel.limpiarMensaje()
+        } else if (mensaje.isNotEmpty()) {
+            // Otros mensajes del ViewModel (errores de base de datos, etc.)
             productoViewModel.limpiarMensaje()
         }
     }
@@ -129,102 +137,184 @@ fun IngresoScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Campo ID
-            OutlinedTextField(
-                value = id,
-                onValueChange = { id = it },
-                label = { Text("ID del Producto") },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ChocolateMedium,
-                    unfocusedBorderColor = ChocolateMedium,
-                    focusedLabelColor = ChocolateDark,
-                    unfocusedLabelColor = ChocolateDark,
-                    focusedTextColor = ChocolateDark,
-                    unfocusedTextColor = ChocolateDark
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = id,
+                    onValueChange = { 
+                        id = it
+                        // Limpiar error cuando el usuario empieza a escribir
+                        erroresValidacion = erroresValidacion.filterKeys { it != "id" }
+                    },
+                    label = { Text("ID del Producto") },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    isError = erroresValidacion.containsKey("id"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = if (erroresValidacion.containsKey("id")) Color.Red else ChocolateMedium,
+                        unfocusedBorderColor = if (erroresValidacion.containsKey("id")) Color.Red else ChocolateMedium,
+                        errorBorderColor = Color.Red,
+                        focusedLabelColor = ChocolateDark,
+                        unfocusedLabelColor = ChocolateDark,
+                        errorLabelColor = Color.Red,
+                        focusedTextColor = ChocolateDark,
+                        unfocusedTextColor = ChocolateDark
+                    )
                 )
-            )
+                // Mensaje de error debajo del campo
+                erroresValidacion["id"]?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
             
             // Campo Nombre
-            OutlinedTextField(
-                value = nombre,
-                onValueChange = { nombre = it },
-                label = { Text("Nombre del Producto") },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ChocolateMedium,
-                    unfocusedBorderColor = ChocolateMedium,
-                    focusedLabelColor = ChocolateDark,
-                    unfocusedLabelColor = ChocolateDark,
-                    focusedTextColor = ChocolateDark,
-                    unfocusedTextColor = ChocolateDark
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { 
+                        nombre = it
+                        erroresValidacion = erroresValidacion.filterKeys { it != "nombre" }
+                    },
+                    label = { Text("Nombre del Producto") },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    isError = erroresValidacion.containsKey("nombre"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = if (erroresValidacion.containsKey("nombre")) Color.Red else ChocolateMedium,
+                        unfocusedBorderColor = if (erroresValidacion.containsKey("nombre")) Color.Red else ChocolateMedium,
+                        errorBorderColor = Color.Red,
+                        focusedLabelColor = ChocolateDark,
+                        unfocusedLabelColor = ChocolateDark,
+                        errorLabelColor = Color.Red,
+                        focusedTextColor = ChocolateDark,
+                        unfocusedTextColor = ChocolateDark
+                    )
                 )
-            )
+                erroresValidacion["nombre"]?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
             
             // Campo Descripción
-            OutlinedTextField(
-                value = descripcion,
-                onValueChange = { descripcion = it },
-                label = { Text("Descripción") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ChocolateMedium,
-                    unfocusedBorderColor = ChocolateMedium,
-                    focusedLabelColor = ChocolateDark,
-                    unfocusedLabelColor = ChocolateDark,
-                    focusedTextColor = ChocolateDark,
-                    unfocusedTextColor = ChocolateDark
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = descripcion,
+                    onValueChange = { 
+                        descripcion = it
+                        erroresValidacion = erroresValidacion.filterKeys { it != "descripcion" }
+                    },
+                    label = { Text("Descripción") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(vertical = 4.dp),
+                    isError = erroresValidacion.containsKey("descripcion"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = if (erroresValidacion.containsKey("descripcion")) Color.Red else ChocolateMedium,
+                        unfocusedBorderColor = if (erroresValidacion.containsKey("descripcion")) Color.Red else ChocolateMedium,
+                        errorBorderColor = Color.Red,
+                        focusedLabelColor = ChocolateDark,
+                        unfocusedLabelColor = ChocolateDark,
+                        errorLabelColor = Color.Red,
+                        focusedTextColor = ChocolateDark,
+                        unfocusedTextColor = ChocolateDark
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                erroresValidacion["descripcion"]?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
             
             // Campo Precio
-            OutlinedTextField(
-                value = precio,
-                onValueChange = { precio = it },
-                label = { Text("Precio") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ChocolateMedium,
-                    unfocusedBorderColor = ChocolateMedium,
-                    focusedLabelColor = ChocolateDark,
-                    unfocusedLabelColor = ChocolateDark,
-                    focusedTextColor = ChocolateDark,
-                    unfocusedTextColor = ChocolateDark
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = precio,
+                    onValueChange = { 
+                        precio = it
+                        erroresValidacion = erroresValidacion.filterKeys { it != "precio" }
+                    },
+                    label = { Text("Precio") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    isError = erroresValidacion.containsKey("precio"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = if (erroresValidacion.containsKey("precio")) Color.Red else ChocolateMedium,
+                        unfocusedBorderColor = if (erroresValidacion.containsKey("precio")) Color.Red else ChocolateMedium,
+                        errorBorderColor = Color.Red,
+                        focusedLabelColor = ChocolateDark,
+                        unfocusedLabelColor = ChocolateDark,
+                        errorLabelColor = Color.Red,
+                        focusedTextColor = ChocolateDark,
+                        unfocusedTextColor = ChocolateDark
+                    )
                 )
-            )
+                erroresValidacion["precio"]?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
             
             // Campo Cantidad
-            OutlinedTextField(
-                value = cantidad,
-                onValueChange = { cantidad = it },
-                label = { Text("Cantidad") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ChocolateMedium,
-                    unfocusedBorderColor = ChocolateMedium,
-                    focusedLabelColor = ChocolateDark,
-                    unfocusedLabelColor = ChocolateDark,
-                    focusedTextColor = ChocolateDark,
-                    unfocusedTextColor = ChocolateDark
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = cantidad,
+                    onValueChange = { 
+                        cantidad = it
+                        erroresValidacion = erroresValidacion.filterKeys { it != "cantidad" }
+                    },
+                    label = { Text("Cantidad") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    isError = erroresValidacion.containsKey("cantidad"),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = if (erroresValidacion.containsKey("cantidad")) Color.Red else ChocolateMedium,
+                        unfocusedBorderColor = if (erroresValidacion.containsKey("cantidad")) Color.Red else ChocolateMedium,
+                        errorBorderColor = Color.Red,
+                        focusedLabelColor = ChocolateDark,
+                        unfocusedLabelColor = ChocolateDark,
+                        errorLabelColor = Color.Red,
+                        focusedTextColor = ChocolateDark,
+                        unfocusedTextColor = ChocolateDark
+                    )
                 )
-            )
+                erroresValidacion["cantidad"]?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
             
             // Imagen
             Box(
@@ -271,9 +361,24 @@ fun IngresoScreen(
             Button(
                 onClick = {
                     scope.launch {
+                        // Validar primero
+                        val resultado = ProductoValidator.validarProducto(
+                            id, nombre, descripcion, precio, cantidad,
+                            esModoEdicion, productoViewModel
+                        )
+                        
+                        // Mostrar errores si los hay
+                        erroresValidacion = resultado.errores
+                        
+                        // Si hay errores, no continuar (NO mostrar Toast)
+                        if (!resultado.esValido) {
+                            return@launch
+                        }
+                        
+                        // Si todo está bien, guardar
                         val exito = ProductoValidator.guardarProducto(
                             id, nombre, descripcion, precio, cantidad, rutaFoto,
-                            esModoEdicion, productoViewModel, onMensaje
+                            esModoEdicion, productoViewModel
                         )
                         if (exito) {
                             // Limpiar campos después de guardar exitosamente
@@ -286,7 +391,8 @@ fun IngresoScreen(
                             imagenBitmap = null
                             imagenCapturada = null
                             rutaImagenCapturada = null
-                            // El mensaje de éxito ya se muestra desde el ViewModel
+                            erroresValidacion = emptyMap()
+                            // El mensaje de éxito se muestra desde el ViewModel (Toast solo para éxito)
                         }
                     }
                 },

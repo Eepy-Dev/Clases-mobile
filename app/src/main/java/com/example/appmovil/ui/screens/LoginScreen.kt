@@ -27,39 +27,29 @@ import com.example.appmovil.ui.viewmodel.LoginViewModel
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onError: (String) -> Unit,
     loginViewModel: LoginViewModel
 ) {
     var usuario by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
     var loginResult by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    var erroresValidacion by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     
     DisposableEffect(Unit) {
         val loginObserver = androidx.lifecycle.Observer<Boolean> { result ->
             loginResult = result
-        }
-        val errorObserver = androidx.lifecycle.Observer<String> { message ->
-            errorMessage = message
+            if (result) {
+                onLoginSuccess()
+            }
         }
         loginViewModel.loginResult.observeForever(loginObserver)
-        loginViewModel.errorMessage.observeForever(errorObserver)
         onDispose {
             loginViewModel.loginResult.removeObserver(loginObserver)
-            loginViewModel.errorMessage.removeObserver(errorObserver)
         }
     }
     
     LaunchedEffect(loginResult) {
         if (loginResult) {
             onLoginSuccess()
-        }
-    }
-    
-    LaunchedEffect(errorMessage) {
-        if (errorMessage.isNotEmpty()) {
-            onError(errorMessage)
-            errorMessage = ""
         }
     }
     
@@ -139,47 +129,92 @@ fun LoginScreen(
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Campo de usuario
-                    OutlinedTextField(
-                        value = usuario,
-                        onValueChange = { usuario = it },
-                        label = { Text("Usuario") },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ChocolateLight,
-                            unfocusedBorderColor = ChocolateLight,
-                            focusedLabelColor = ChocolateDark,
-                            unfocusedLabelColor = ChocolateDark,
-                            focusedTextColor = ChocolateDark,
-                            unfocusedTextColor = ChocolateDark
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = usuario,
+                            onValueChange = { 
+                                usuario = it
+                                // Limpiar error cuando el usuario empieza a escribir
+                                erroresValidacion = erroresValidacion.filterKeys { it != "usuario" && it != "general" }
+                            },
+                            label = { Text("Usuario") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            isError = erroresValidacion.containsKey("usuario") || erroresValidacion.containsKey("general"),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (erroresValidacion.containsKey("usuario") || erroresValidacion.containsKey("general")) Color.Red else ChocolateLight,
+                                unfocusedBorderColor = if (erroresValidacion.containsKey("usuario") || erroresValidacion.containsKey("general")) Color.Red else ChocolateLight,
+                                errorBorderColor = Color.Red,
+                                focusedLabelColor = ChocolateDark,
+                                unfocusedLabelColor = ChocolateDark,
+                                errorLabelColor = Color.Red,
+                                focusedTextColor = ChocolateDark,
+                                unfocusedTextColor = ChocolateDark
+                            )
                         )
-                    )
+                        // Mensaje de error debajo del campo
+                        erroresValidacion["usuario"]?.let { error ->
+                            Text(
+                                text = error,
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                            )
+                        }
+                    }
                     
                     // Campo de contraseña
-                    OutlinedTextField(
-                        value = contrasena,
-                        onValueChange = { contrasena = it },
-                        label = { Text("Contraseña") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ChocolateLight,
-                            unfocusedBorderColor = ChocolateLight,
-                            focusedLabelColor = ChocolateDark,
-                            unfocusedLabelColor = ChocolateDark,
-                            focusedTextColor = ChocolateDark,
-                            unfocusedTextColor = ChocolateDark
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = contrasena,
+                            onValueChange = { 
+                                contrasena = it
+                                // Limpiar error cuando el usuario empieza a escribir
+                                erroresValidacion = erroresValidacion.filterKeys { it != "contrasena" && it != "general" }
+                            },
+                            label = { Text("Contraseña") },
+                            visualTransformation = PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            isError = erroresValidacion.containsKey("contrasena") || erroresValidacion.containsKey("general"),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (erroresValidacion.containsKey("contrasena") || erroresValidacion.containsKey("general")) Color.Red else ChocolateLight,
+                                unfocusedBorderColor = if (erroresValidacion.containsKey("contrasena") || erroresValidacion.containsKey("general")) Color.Red else ChocolateLight,
+                                errorBorderColor = Color.Red,
+                                focusedLabelColor = ChocolateDark,
+                                unfocusedLabelColor = ChocolateDark,
+                                errorLabelColor = Color.Red,
+                                focusedTextColor = ChocolateDark,
+                                unfocusedTextColor = ChocolateDark
+                            )
                         )
-                    )
+                        // Mensaje de error debajo del campo
+                        erroresValidacion["contrasena"]?.let { error ->
+                            Text(
+                                text = error,
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                            )
+                        }
+                        // Error general (credenciales incorrectas) debajo de contraseña
+                        erroresValidacion["general"]?.let { error ->
+                            Text(
+                                text = error,
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                            )
+                        }
+                    }
                 }
             }
             
@@ -198,7 +233,8 @@ fun LoginScreen(
             ) {
                 Button(
                     onClick = {
-                        loginViewModel.validarLogin(usuario.trim(), contrasena.trim())
+                        val resultado = loginViewModel.validarLogin(usuario.trim(), contrasena.trim())
+                        erroresValidacion = resultado.errores
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
