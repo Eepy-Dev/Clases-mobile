@@ -1,4 +1,4 @@
-package com.example.appmovil
+package com.example.appmovil.ui.viewmodel
 
 import android.app.Application
 import android.graphics.Bitmap
@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.appmovil.data.AppDatabase
+import com.example.appmovil.data.Producto
 import kotlinx.coroutines.launch
 
 class ProductoViewModel(application: Application) : AndroidViewModel(application) {
@@ -90,3 +92,4 @@ class ProductoViewModel(application: Application) : AndroidViewModel(application
         _imagenCapturada.value = Pair(bitmap, ruta)
     }
 }
+

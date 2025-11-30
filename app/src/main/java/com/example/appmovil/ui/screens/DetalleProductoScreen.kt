@@ -1,13 +1,6 @@
-package com.example.appmovil
+package com.example.appmovil.ui.screens
 
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,65 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.appmovil.ui.theme.AppMovilTheme
+import com.example.appmovil.data.Producto
 import com.example.appmovil.ui.theme.ChocolateDark
 import com.example.appmovil.ui.theme.ChocolateMedium
 import com.example.appmovil.ui.theme.Cream
-import java.io.File
-
-class DetalleProductoActivity : ComponentActivity() {
-    
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        
-        val producto = intent.getSerializableExtra("producto") as? Producto
-        
-        if (producto == null) {
-            Toast.makeText(this, "Error: Producto no encontrado", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-        
-        setContent {
-            AppMovilTheme {
-                DetalleProductoScreen(
-                    producto = producto,
-                    onVolverClick = { finish() },
-                    onCompartirClick = { producto ->
-                        compartirProducto(producto)
-                    }
-                )
-            }
-        }
-    }
-    
-    private fun compartirProducto(producto: Producto) {
-        val mensaje = """
-            🍫 Detalles del Producto:
-            
-            📋 ID: ${producto.id}
-            🏷️ Nombre: ${producto.nombre}
-            📝 Descripción: ${producto.descripcion}
-            💰 Precio: $${producto.precio}
-            📦 Stock: ${producto.cantidad}
-        """.trimIndent()
-        
-        try {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.setPackage("com.whatsapp")
-            intent.putExtra(Intent.EXTRA_TEXT, mensaje)
-            startActivity(intent)
-        } catch (e: Exception) {
-            // Si WhatsApp no está instalado, usar cualquier app de mensajería
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.putExtra(Intent.EXTRA_TEXT, mensaje)
-            startActivity(Intent.createChooser(intent, "Compartir producto"))
-        }
-    }
-}
+import com.example.appmovil.ui.theme.CreamDark
+import com.example.appmovil.util.ImageUtils
 
 @Composable
 fun DetalleProductoScreen(
@@ -97,7 +37,7 @@ fun DetalleProductoScreen(
     // Cargar imagen si existe
     LaunchedEffect(producto.foto) {
         if (producto.foto != null) {
-            val bitmap = cargarImagen(producto.foto)
+            val bitmap = ImageUtils.cargarImagen(producto.foto)
             if (bitmap != null) {
                 imagenBitmap = bitmap
             }
@@ -150,7 +90,7 @@ fun DetalleProductoScreen(
                         .height(300.dp),
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = com.example.appmovil.ui.theme.CreamDark)
+                    colors = CardDefaults.cardColors(containerColor = CreamDark)
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -327,11 +267,3 @@ fun DetalleProductoScreen(
     }
 }
 
-private fun cargarImagen(ruta: String): Bitmap? {
-    val archivo = File(ruta)
-    return if (archivo.exists()) {
-        BitmapFactory.decodeFile(ruta)
-    } else {
-        null
-    }
-}
