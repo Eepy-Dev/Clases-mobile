@@ -188,7 +188,17 @@ class ProductRepository(
     suspend fun login(username: String, password: String): Result<String> = withContext(Dispatchers.IO) {
         try {
             val credentials = mapOf("username" to username, "password" to password)
-            handle(userApi.login(credentials))
+            val response = userApi.login(credentials)
+            if (response.isSuccessful && response.body() != null) {
+                val loginResponse = response.body()!!
+                if (loginResponse.error != null) {
+                    Result.failure(Exception(loginResponse.error))
+                } else {
+                    Result.success(loginResponse.message)
+                }
+            } else {
+                Result.failure(Exception("Error en login: ${response.code()}"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
