@@ -21,6 +21,9 @@ sealed class Screen(val route: String) {
     object Register : Screen("register")
     object Catalog : Screen("catalog")
     object History : Screen("history")
+    object Detail : Screen("detail/{productId}") {
+        fun createRoute(productId: Long) = "detail/$productId"
+    }
 }
 
 
@@ -80,6 +83,9 @@ fun AppNavigation(
         composable(Screen.Consulta.route) {
             ConsultaScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToDetail = { productId ->
+                    navController.navigate(Screen.Detail.createRoute(productId))
+                },
                 viewModel = productViewModel
             )
         }
@@ -99,6 +105,17 @@ fun AppNavigation(
             HistoryScreen(
                 onNavigateBack = { navController.popBackStack() },
                 viewModel = productViewModel
+            )
+        }
+        composable(
+            route = Screen.Detail.route,
+            arguments = listOf(androidx.navigation.navArgument("productId") { type = androidx.navigation.NavType.LongType })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getLong("productId") ?: 0L
+            ProductDetailScreen(
+                productId = productId,
+                viewModel = productViewModel,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }
