@@ -28,6 +28,8 @@ fun MenuScreen(
         isVisible = true
     }
 
+    val userRole by viewModel.userRole.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,14 +67,20 @@ fun MenuScreen(
                 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                ChocoButton(text = "Salida", onClick = onNavigateToSalida)
-                Spacer(modifier = Modifier.height(16.dp))
+                // Only Admin can delete/adjust stock (Salida)
+                if (userRole == "ADMIN") {
+                    ChocoButton(text = "Salida", onClick = onNavigateToSalida)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 ChocoButton(text = "Consulta", onClick = onNavigateToConsulta)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ChocoButton(text = "Ingreso", onClick = onNavigateToIngreso)
-                Spacer(modifier = Modifier.height(16.dp))
+                // Only Admin can create products (Ingreso)
+                if (userRole == "ADMIN") {
+                    ChocoButton(text = "Ingreso", onClick = onNavigateToIngreso)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
                 
                 ChocoButton(text = "Historial", onClick = { /* TODO: Implement Historial */ })
                 Spacer(modifier = Modifier.height(16.dp))

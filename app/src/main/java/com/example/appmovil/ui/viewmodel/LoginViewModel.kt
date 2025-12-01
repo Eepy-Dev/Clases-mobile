@@ -15,7 +15,8 @@ data class LoginUiState(
 )
 
 class LoginViewModel(
-    private val repository: ProductRepository = ProductRepository()
+    private val repository: ProductRepository = ProductRepository(),
+    private val userPreferencesRepository: com.example.appmovil.data.local.UserPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -24,8 +25,21 @@ class LoginViewModel(
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _uiState.value = LoginUiState(isLoading = true)
+
+            // Strict Email Validation
+            val allowedEmails = listOf("admin@pasteleria.cl", "vendedor@pasteleria.cl")
+            if (username !in allowedEmails) {
+                _uiState.value = LoginUiState(error = "Acceso denegado. Solo personal autorizado.")
+                return@launch
+            }
+
             val result = repository.login(username, password)
             if (result.isSuccess) {
+                // Mocking Role based on email for now since backend might not return it yet
+                val role = if (username == "admin@pasteleria.cl") "ADMIN" else "VENDEDOR"
+                val token = "mock_token_123" // In real app, get from result
+                
+                userPreferencesRepository.saveUserSession(token, role, username)
                 _uiState.value = LoginUiState(isSuccess = true)
             } else {
                 _uiState.value = LoginUiState(error = result.exceptionOrNull()?.message ?: "Error desconocido")
@@ -35,18 +49,7 @@ class LoginViewModel(
 
     fun register(username: String, password: String, email: String) {
         viewModelScope.launch {
-            _uiState.value = LoginUiState(isLoading = true)
-            // Assuming repository.createUser expects a User object. 
-            // We need to check User model and ProductRepository.createUser signature.
-            // For now, I'll assume User has username, password, email.
-            // Wait, I need to check User model first.
-            val user = com.example.appmovil.domain.model.User(username = username, password = password, email = email)
-            val result = repository.createUser(user)
-            if (result.isSuccess) {
-                _uiState.value = LoginUiState(isSuccess = true)
-            } else {
-                _uiState.value = LoginUiState(error = result.exceptionOrNull()?.message ?: "Error al registrar")
-            }
+             _uiState.value = LoginUiState(error = "El registro público está deshabilitado.")
         }
     }
 

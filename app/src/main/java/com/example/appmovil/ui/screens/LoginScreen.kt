@@ -34,93 +34,103 @@ fun LoginScreen(
         viewModel.resetState()
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
+            snackbarHostState.showSnackbar("Inicio de sesión exitoso")
             onLoginSuccess()
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        AnimatedVisibility(
-            visible = isVisible,
-            enter = fadeIn() + slideInVertically()
+    LaunchedEffect(uiState.error) {
+        if (uiState.error != null) {
+            snackbarHostState.showSnackbar(uiState.error!!)
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val infiniteTransition = rememberInfiniteTransition(label = "logoInfinite")
-                val scale by infiniteTransition.animateFloat(
-                    initialValue = 1f,
-                    targetValue = 1.1f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(1000),
-                        repeatMode = RepeatMode.Reverse
-                    ),
-                    label = "logoScale"
-                )
-                
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo Choco App",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                        }
-                )
-                Spacer(modifier = Modifier.height(32.dp))
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn() + slideInVertically()
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "logoInfinite")
+                    val scale by infiniteTransition.animateFloat(
+                        initialValue = 1f,
+                        targetValue = 1.1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1000),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "logoScale"
+                    )
+                    
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Logo Choco App",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                            }
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
 
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    label = { Text("Usuario") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-
-                if (uiState.isLoading) {
-                    CircularProgressIndicator()
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Usuario") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
-                }
 
-                if (uiState.error != null) {
-                    Text(text = uiState.error!!, color = MaterialTheme.colorScheme.error)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Contraseña") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                ChocoButton(
-                    text = "Ingresar",
-                    onClick = {
-                        if (username.isNotEmpty() && password.isNotEmpty()) {
-                            viewModel.login(username, password)
-                        }
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                TextButton(onClick = onNavigateToRegister) {
-                    Text("¿No tienes cuenta? Regístrate")
-                }
-                
-                TextButton(onClick = { /* TODO: Implement Forgot Password */ }) {
-                    Text("Olvidé mi contraseña")
+
+                    ChocoButton(
+                        text = "Ingresar",
+                        onClick = {
+                            if (username.isNotEmpty() && password.isNotEmpty()) {
+                                viewModel.login(username, password)
+                            }
+                        }
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Registration disabled for strict access
+                    // TextButton(onClick = onNavigateToRegister) {
+                    //     Text("¿No tienes cuenta? Regístrate")
+                    // }
+                    
+                    TextButton(onClick = { /* TODO: Implement Forgot Password */ }) {
+                        Text("Olvidé mi contraseña")
+                    }
                 }
             }
         }

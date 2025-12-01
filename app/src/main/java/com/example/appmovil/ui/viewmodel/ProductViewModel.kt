@@ -8,6 +8,8 @@ import com.example.appmovil.domain.model.InventoryMovement
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 
 data class ProductUiState(
@@ -20,11 +22,15 @@ data class ProductUiState(
 )
 
 class ProductViewModel(
-    private val repository: ProductRepository = ProductRepository()
+    private val repository: ProductRepository = ProductRepository(),
+    private val userPreferencesRepository: com.example.appmovil.data.local.UserPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductUiState())
     val uiState: StateFlow<ProductUiState> = _uiState.asStateFlow()
+    
+    val userRole: StateFlow<String?> = userPreferencesRepository.userRole
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     init {
         loadProducts()

@@ -23,23 +23,29 @@ class MainActivity : ComponentActivity() {
         ).build()
         
         val repository = ProductRepository(productDao = db.productDao())
+        val userPreferencesRepository = com.example.appmovil.data.local.UserPreferencesRepository(applicationContext)
         
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(ProductViewModel::class.java)) {
                     @Suppress("UNCHECKED_CAST")
-                    return ProductViewModel(repository) as T
+                    return ProductViewModel(repository, userPreferencesRepository) as T
+                }
+                if (modelClass.isAssignableFrom(com.example.appmovil.ui.viewmodel.LoginViewModel::class.java)) {
+                    @Suppress("UNCHECKED_CAST")
+                    return com.example.appmovil.ui.viewmodel.LoginViewModel(repository, userPreferencesRepository) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
         
         val productViewModel = ViewModelProvider(this, factory)[ProductViewModel::class.java]
+        val loginViewModel = ViewModelProvider(this, factory)[com.example.appmovil.ui.viewmodel.LoginViewModel::class.java]
 
         enableEdgeToEdge()
         setContent {
             AppMovilTheme {
-                AppNavigation(productViewModel = productViewModel)
+                AppNavigation(productViewModel = productViewModel, loginViewModel = loginViewModel)
             }
         }
     }
