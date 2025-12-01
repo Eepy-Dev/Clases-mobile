@@ -1,31 +1,39 @@
-#Clases-mobile
-Repo para clases de desarrollo movil
+# ChocoApp - Mobile Inventory System
 
-Añadiéndome como colaboradora
-# Proyecto App Móvil
+## Credentials / Credenciales
 
-App desarrollada en Android Studio por Paz Molina y Jordan Villegas.
-Incluye navegación, interfaz base y estructura MVVM.
-=======
+### Admin
+- **Email/User**: `admin@pasteleria.cl`
+- **Password**: `admin`
+- **Role**: ADMIN (Full Access)
 
-##no tocar hasta el final donde dice pull request##
+### Vendedor
+- **Email/User**: `vendedor@pasteleria.cl`
+- **Password**: `vendedor`
+- **Role**: VENDEDOR (Restricted Access)
 
-git checkout main < para irte a la main
+## Running the Project / Ejecución
 
-Crea y cambia a la nueva rama
+### Backend (Microservices)
+The backend consists of 3 microservices (Spring Boot).
+Run them in separate terminals or using the provided Gradle wrapper:
 
-git checkout -b Nombre rama
+```bash
+./gradlew :backend:user-service:bootRun
+./gradlew :backend:products-service:bootRun
+./gradlew :backend:inventory-service:bootRun
+```
 
-git add . para añadir todos los cambios
+**Note**: If you updated the credentials in `DataLoader.java`, please restart the `user-service`.
 
-Haz un commit con los cambios
+### Mobile App (Android)
+1. Open the project in Android Studio.
+2. Sync Gradle.
+3. Run on an Emulator or Device (API 26+).
+4. Ensure the emulator can access the backend (default `10.0.2.2` for localhost).
 
-git commit -m "Cambios que hice "
-
-git status para ver los cambios hechos
-
-#Sube la nueva rama al repositorio remoto
-
-git push origin Nombre rama
-
-
+## Features / Funcionalidades
+- **Login Strict**: Only specific emails allowed.
+- **Role Based UI**: Admin sees all options; Vendedor sees only "Consulta".
+- **Offline Support**: Room Database caches products.
+- **Animations**: Smooth transitions and interactions.

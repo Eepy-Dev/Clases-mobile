@@ -16,13 +16,22 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (repository.findByUsername("admin").isEmpty()) {
+        if (repository.findByUsername("admin@pasteleria.cl").isEmpty()) {
             Usuario admin = new Usuario();
-            admin.setUsername("admin");
+            admin.setUsername("admin@pasteleria.cl");
             admin.setPassword("admin");
-            admin.setEmail("admin@example.com");
+            admin.setEmail("admin@pasteleria.cl");
             repository.save(admin);
-            System.out.println("User 'admin' created with password 'admin'");
+            System.out.println("User 'admin@pasteleria.cl' created");
+        }
+
+        if (repository.findByUsername("vendedor@pasteleria.cl").isEmpty()) {
+            Usuario vendedor = new Usuario();
+            vendedor.setUsername("vendedor@pasteleria.cl");
+            vendedor.setPassword("vendedor");
+            vendedor.setEmail("vendedor@pasteleria.cl");
+            repository.save(vendedor);
+            System.out.println("User 'vendedor@pasteleria.cl' created");
         }
     }
 }
