@@ -80,7 +80,7 @@ class ProductRepository(
             Product(id = 107, nombre = "Tarta de Frutilla", precio = 14000.0, stock = 8, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.tarta_frutilla_v2}"),
             Product(id = 108, nombre = "Alfajores Artesanales", precio = 1500.0, stock = 50, imagenUrl = "https://placehold.co/600x400?text=Alfajores"),
             Product(id = 109, nombre = "Macarons Surtidos", precio = 10000.0, stock = 12, imagenUrl = "https://placehold.co/600x400?text=Macarons"),
-            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cheesecake_frambuesa}")
+            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cheesecake_frambuesa_v2}")
         )
         val mockProduct = mockCatalog.find { it.id == id }
         if (mockProduct != null) {
@@ -189,7 +189,7 @@ class ProductRepository(
             Product(id = 107, nombre = "Tarta de Frutilla", precio = 14000.0, stock = 8, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.tarta_frutilla_v2}"),
             Product(id = 108, nombre = "Alfajores Artesanales", precio = 1500.0, stock = 50, imagenUrl = "https://placehold.co/600x400?text=Alfajores"),
             Product(id = 109, nombre = "Macarons Surtidos", precio = 10000.0, stock = 12, imagenUrl = "https://placehold.co/600x400?text=Macarons"),
-            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cheesecake_frambuesa}")
+            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cheesecake_frambuesa_v2}")
         )
         Result.success(mockCatalog)
     }
