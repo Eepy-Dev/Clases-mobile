@@ -19,6 +19,8 @@ sealed class Screen(val route: String) {
     object Consulta : Screen("consulta")
     object Salida : Screen("salida")
     object Register : Screen("register")
+    object Catalog : Screen("catalog")
+    object History : Screen("history")
 }
 
 
@@ -64,6 +66,8 @@ fun AppNavigation(
                 onNavigateToIngreso = { navController.navigate(Screen.Ingreso.route) },
                 onNavigateToConsulta = { navController.navigate(Screen.Consulta.route) },
                 onNavigateToSalida = { navController.navigate(Screen.Salida.route) },
+                onNavigateToCatalog = { navController.navigate(Screen.Catalog.route) },
+                onNavigateToHistory = { navController.navigate(Screen.History.route) },
                 viewModel = productViewModel
             )
         }
@@ -81,6 +85,18 @@ fun AppNavigation(
         }
         composable(Screen.Salida.route) {
             SalidaScreen(
+                onNavigateBack = { navController.popBackStack() },
+                viewModel = productViewModel
+            )
+        }
+        composable(Screen.Catalog.route) {
+            CatalogScreen(
+                onNavigateBack = { navController.popBackStack() },
+                viewModel = productViewModel
+            )
+        }
+        composable(Screen.History.route) {
+            HistoryScreen(
                 onNavigateBack = { navController.popBackStack() },
                 viewModel = productViewModel
             )

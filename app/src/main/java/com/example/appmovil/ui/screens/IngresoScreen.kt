@@ -83,6 +83,36 @@ fun IngresoScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Camera Logic
+                val context = androidx.compose.ui.platform.LocalContext.current
+                var tempPhotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+                
+                val cameraLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+                    contract = androidx.activity.result.contract.ActivityResultContracts.TakePicture()
+                ) { success ->
+                    if (success && tempPhotoUri != null) {
+                        imagenUrl = tempPhotoUri.toString()
+                    }
+                }
+
+                ChocoButton(
+                    text = "Tomar Foto",
+                    onClick = {
+                        val photoFile = java.io.File(
+                            context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES),
+                            "product_${System.currentTimeMillis()}.jpg"
+                        )
+                        val uri = androidx.core.content.FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            photoFile
+                        )
+                        tempPhotoUri = uri
+                        cameraLauncher.launch(uri)
+                    }
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (uiState.isLoading) {

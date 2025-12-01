@@ -22,7 +22,10 @@ class MainActivity : ComponentActivity() {
             AppDatabase::class.java, "app-database"
         ).build()
         
-        val repository = ProductRepository(productDao = db.productDao())
+        val repository = ProductRepository(
+            productDao = db.productDao(),
+            deletedProductDao = db.deletedProductDao()
+        )
         val userPreferencesRepository = com.example.appmovil.data.local.UserPreferencesRepository(applicationContext)
         
         val factory = object : ViewModelProvider.Factory {

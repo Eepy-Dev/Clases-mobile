@@ -16,6 +16,8 @@ fun MenuScreen(
     onNavigateToIngreso: () -> Unit,
     onNavigateToConsulta: () -> Unit,
     onNavigateToSalida: () -> Unit,
+    onNavigateToCatalog: () -> Unit,
+    onNavigateToHistory: () -> Unit,
     viewModel: ProductViewModel
 ) {
     val userRole by viewModel.userRole.collectAsState()
@@ -67,9 +69,9 @@ fun MenuScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
         
-        ChocoButton(text = "Historial", onClick = { /* TODO: Implement Historial */ })
+        ChocoButton(text = "Historial", onClick = onNavigateToHistory)
         Spacer(modifier = Modifier.height(16.dp))
         
-        ChocoButton(text = "Catálogo Online", onClick = { /* TODO: Implement Catalog */ })
+        ChocoButton(text = "Catálogo Online", onClick = onNavigateToCatalog)
     }
 }

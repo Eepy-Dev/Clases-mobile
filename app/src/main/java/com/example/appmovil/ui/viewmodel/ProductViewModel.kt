@@ -129,8 +129,26 @@ class ProductViewModel(
         _uiState.value = _uiState.value.copy(selectedProduct = product)
     }
 
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
+    fun loadOnlineCatalog(onResult: (List<Product>) -> Unit) {
+        viewModelScope.launch {
+            val result = repository.getOnlineCatalog()
+            result.onSuccess { products ->
+                onResult(products)
+            }.onFailure {
+                onResult(emptyList())
+            }
+        }
+    }
+
+    fun loadDeletedProducts(onResult: (List<com.example.appmovil.data.local.entity.DeletedProductEntity>) -> Unit) {
+        viewModelScope.launch {
+            val result = repository.getDeletedProducts()
+            result.onSuccess { products ->
+                onResult(products)
+            }.onFailure {
+                onResult(emptyList())
+            }
+        }
     }
 }
 

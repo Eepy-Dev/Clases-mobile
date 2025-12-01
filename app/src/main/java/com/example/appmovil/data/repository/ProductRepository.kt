@@ -17,7 +17,8 @@ class ProductRepository(
     private val inventoryApi: InventoryApiService = RetrofitClient.inventoryApiService,
     private val userApi: UserApiService = RetrofitClient.userApiService,
     private val externalApi: ExternalApiService = RetrofitClient.externalApiService,
-    private val productDao: com.example.appmovil.data.local.dao.ProductDao? = null
+    private val productDao: com.example.appmovil.data.local.dao.ProductDao? = null,
+    private val deletedProductDao: com.example.appmovil.data.local.dao.DeletedProductDao? = null
 ) {
 
     private fun <T> handle(response: Response<T>): Result<T> {
@@ -120,6 +121,21 @@ class ProductRepository(
 
     suspend fun deleteProduct(id: Long): Result<Unit> = withContext(Dispatchers.IO) {
         try {
+            // First get the product to save it to history
+            val productResult = getProductById(id)
+            if (productResult.isSuccess) {
+                val product = productResult.getOrNull()
+                if (product != null) {
+                    deletedProductDao?.insertDeletedProduct(
+                        com.example.appmovil.data.local.entity.DeletedProductEntity(
+                            originalId = product.id,
+                            nombre = product.nombre,
+                            precio = product.precio
+                        )
+                    )
+                }
+            }
+
             val response = api.deleteProduct(id)
             if (response.isSuccessful) {
                 productDao?.deleteProductById(id)
@@ -130,6 +146,33 @@ class ProductRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    suspend fun getDeletedProducts(): Result<List<com.example.appmovil.data.local.entity.DeletedProductEntity>> = withContext(Dispatchers.IO) {
+        try {
+            deletedProductDao?.let { dao ->
+                Result.success(dao.getAllDeletedProducts())
+            } ?: Result.failure(Exception("No local database"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getOnlineCatalog(): Result<List<Product>> = withContext(Dispatchers.IO) {
+        // Mock data for "Catálogo Online"
+        val mockCatalog = listOf(
+            Product(id = 101, nombre = "Torta de Chocolate", precio = 15000.0, stock = 10, imagenUrl = "https://example.com/torta.jpg"),
+            Product(id = 102, nombre = "Galletas de Almendra", precio = 5000.0, stock = 20, imagenUrl = "https://example.com/galletas.jpg"),
+            Product(id = 103, nombre = "Trufas de Chocolate", precio = 8000.0, stock = 15, imagenUrl = "https://example.com/trufas.jpg"),
+            Product(id = 104, nombre = "Pie de Limón", precio = 12000.0, stock = 5, imagenUrl = "https://example.com/pie.jpg"),
+            Product(id = 105, nombre = "Cupcakes Red Velvet", precio = 2500.0, stock = 30, imagenUrl = "https://example.com/cupcakes.jpg"),
+            Product(id = 106, nombre = "Brownie con Nuez", precio = 3000.0, stock = 25, imagenUrl = "https://example.com/brownie.jpg"),
+            Product(id = 107, nombre = "Tarta de Frutilla", precio = 14000.0, stock = 8, imagenUrl = "https://example.com/tarta.jpg"),
+            Product(id = 108, nombre = "Alfajores Artesanales", precio = 1500.0, stock = 50, imagenUrl = "https://example.com/alfajores.jpg"),
+            Product(id = 109, nombre = "Macarons Surtidos", precio = 10000.0, stock = 12, imagenUrl = "https://example.com/macarons.jpg"),
+            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "https://example.com/cheesecake.jpg")
+        )
+        Result.success(mockCatalog)
     }
 
     suspend fun searchProducts(nombre: String): Result<List<Product>> = withContext(Dispatchers.IO) {
