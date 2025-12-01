@@ -128,7 +128,7 @@ class ProductRepository(
                 if (product != null) {
                     deletedProductDao?.insertDeletedProduct(
                         com.example.appmovil.data.local.entity.DeletedProductEntity(
-                            originalId = product.id,
+                            originalId = product.id ?: 0L,
                             nombre = product.nombre,
                             precio = product.precio
                         )
