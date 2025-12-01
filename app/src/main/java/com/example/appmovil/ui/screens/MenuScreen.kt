@@ -3,6 +3,8 @@ package com.example.appmovil.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.core.*
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,7 +22,6 @@ fun MenuScreen(
     onNavigateToSalida: () -> Unit,
     viewModel: ProductViewModel
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     var isVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -39,32 +40,44 @@ fun MenuScreen(
             enter = fadeIn() + slideInVertically()
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Menú Principal",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary
+                // Logo (using the same resource as Login for now, assuming it's the ChocoApp logo)
+                val infiniteTransition = rememberInfiniteTransition(label = "logoInfinite")
+                val scale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.05f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(2000),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "logoScale"
                 )
+
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = com.example.appmovil.R.drawable.logo),
+                    contentDescription = "Logo Choco App",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                        }
+                )
+                
                 Spacer(modifier = Modifier.height(32.dp))
 
-                ChocoButton(text = "Ingreso de Productos", onClick = onNavigateToIngreso)
+                ChocoButton(text = "Salida", onClick = onNavigateToSalida)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ChocoButton(text = "Consulta de Productos", onClick = onNavigateToConsulta)
+                ChocoButton(text = "Consulta", onClick = onNavigateToConsulta)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ChocoButton(text = "Salida de Productos", onClick = onNavigateToSalida)
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                if (uiState.externalImageUrl != null) {
-                    Text("Imagen Aleatoria (API Externa):", style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AsyncImage(
-                        model = uiState.externalImageUrl,
-                        contentDescription = "Random Dog",
-                        modifier = Modifier.size(200.dp)
-                    )
-                }
+                ChocoButton(text = "Ingreso", onClick = onNavigateToIngreso)
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                ChocoButton(text = "Historial", onClick = { /* TODO: Implement Historial */ })
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                ChocoButton(text = "Catálogo Online", onClick = { /* TODO: Implement Catalog */ })
             }
         }
     }

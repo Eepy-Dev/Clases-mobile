@@ -3,8 +3,6 @@ package com.example.appmovil.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.core.*
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -14,20 +12,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.appmovil.R
 import com.example.appmovil.ui.components.ChocoButton
 import com.example.appmovil.ui.viewmodel.LoginViewModel
-import com.example.appmovil.R
 
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit,
+fun RegisterScreen(
+    onRegisterSuccess: () -> Unit,
+    onNavigateBack: () -> Unit,
     viewModel: LoginViewModel
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     val uiState by viewModel.uiState.collectAsState()
     var isVisible by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         isVisible = true
@@ -36,7 +36,7 @@ fun LoginScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            onLoginSuccess()
+            onRegisterSuccess()
         }
     }
 
@@ -52,33 +52,38 @@ fun LoginScreen(
             enter = fadeIn() + slideInVertically()
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val infiniteTransition = rememberInfiniteTransition(label = "logoInfinite")
-                val scale by infiniteTransition.animateFloat(
-                    initialValue = 1f,
-                    targetValue = 1.1f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(1000),
-                        repeatMode = RepeatMode.Reverse
-                    ),
-                    label = "logoScale"
-                )
-                
                 Image(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "Logo Choco App",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                        }
+                    modifier = Modifier.size(150.dp)
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Registro",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
                     label = { Text("Usuario") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { 
+                        email = it 
+                        emailError = if (isValidEmail(it)) null else "Email inválido (use @gmail, @duocuc.cl, @pasteleria.cl)"
+                    },
+                    label = { Text("Email") },
+                    isError = emailError != null,
+                    supportingText = { if (emailError != null) Text(emailError!!) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium
                 )
@@ -105,26 +110,27 @@ fun LoginScreen(
                 }
 
                 ChocoButton(
-                    text = "Ingresar",
+                    text = "Registrarse",
                     onClick = {
-                        if (username.isNotEmpty() && password.isNotEmpty()) {
-                            viewModel.login(username, password)
+                        if (username.isNotEmpty() && password.isNotEmpty() && isValidEmail(email)) {
+                            viewModel.register(username, password, email)
+                        } else if (!isValidEmail(email)) {
+                            emailError = "Email inválido"
                         }
                     }
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                TextButton(onClick = onNavigateToRegister) {
-                    Text("¿No tienes cuenta? Regístrate")
-                }
-                
-                TextButton(onClick = { /* TODO: Implement Forgot Password */ }) {
-                    Text("Olvidé mi contraseña")
+                TextButton(onClick = onNavigateBack) {
+                    Text("Volver al Login")
                 }
             }
         }
     }
 }
 
-
+fun isValidEmail(email: String): Boolean {
+    val allowedDomains = listOf("gmail.com", "duocuc.cl", "pasteleria.cl")
+    return allowedDomains.any { email.endsWith("@$it") }
+}

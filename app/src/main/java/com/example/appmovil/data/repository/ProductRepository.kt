@@ -212,13 +212,6 @@ class ProductRepository(
         }
     }
 
-    suspend fun getRandomDogImage(): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            val resp = externalApi.getRandomDogImage()
-            Result.success(resp.message)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+
 }
 

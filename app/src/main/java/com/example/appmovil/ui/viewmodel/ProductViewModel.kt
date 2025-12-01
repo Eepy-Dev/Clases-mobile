@@ -28,7 +28,7 @@ class ProductViewModel(
 
     init {
         loadProducts()
-        loadExternalImage()
+
     }
 
     fun loadProducts() {
@@ -55,14 +55,7 @@ class ProductViewModel(
         }
     }
 
-    fun loadExternalImage() {
-        viewModelScope.launch {
-            val result = repository.getRandomDogImage()
-            result.onSuccess { url ->
-                _uiState.value = _uiState.value.copy(externalImageUrl = url)
-            }
-        }
-    }
+
 
     fun addProduct(nombre: String, precio: Double, stock: Int, imagenUrl: String?) {
         viewModelScope.launch {

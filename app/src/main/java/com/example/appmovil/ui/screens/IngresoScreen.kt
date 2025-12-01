@@ -79,6 +79,7 @@ fun IngresoScreen(
                     value = imagenUrl,
                     onValueChange = { imagenUrl = it },
                     label = { Text("URL Imagen (Opcional)") },
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium
                 )

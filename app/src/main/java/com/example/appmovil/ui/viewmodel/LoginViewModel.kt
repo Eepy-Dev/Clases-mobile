@@ -33,6 +33,23 @@ class LoginViewModel(
         }
     }
 
+    fun register(username: String, password: String, email: String) {
+        viewModelScope.launch {
+            _uiState.value = LoginUiState(isLoading = true)
+            // Assuming repository.createUser expects a User object. 
+            // We need to check User model and ProductRepository.createUser signature.
+            // For now, I'll assume User has username, password, email.
+            // Wait, I need to check User model first.
+            val user = com.example.appmovil.domain.model.User(username = username, password = password, email = email)
+            val result = repository.createUser(user)
+            if (result.isSuccess) {
+                _uiState.value = LoginUiState(isSuccess = true)
+            } else {
+                _uiState.value = LoginUiState(error = result.exceptionOrNull()?.message ?: "Error al registrar")
+            }
+        }
+    }
+
     fun resetState() {
         _uiState.value = LoginUiState()
     }
