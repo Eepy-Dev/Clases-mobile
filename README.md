@@ -1,6 +1,6 @@
 # 🍰 Sistema de Gestión de Inventario - Pastelería
 
-Hola! 👋 Este es nuestro proyecto de la evaluación parcial 3. Es una aplicación móvil Android completa para gestionar el inventario de una pastelería, con integración a microservicios en Spring Boot.
+Hola! 👋 Este es nuestro proyecto de la evaluación parcial 4. Es una aplicación móvil Android completa para gestionar el inventario de una pastelería, con integración a microservicios en Spring Boot.
 
 ## 👥 Integrantes
 
@@ -58,9 +58,10 @@ La app funciona con un enfoque **offline-first**, es decir, guarda todo localmen
 ### 🔄 Sincronización
 
 - Los productos se sincronizan automáticamente con el backend
-- Los movimientos también se sincronizan
-- Productos del catálogo web (EXT-*) se guardan solo localmente
-- Productos creados manualmente se sincronizan completamente
+- Los productos creados manualmente obtienen ID local "PROD-X" (ej: PROD-1, PROD-2)
+- Al sincronizar, el backend genera un ID numérico y el producto local se actualiza
+- Los movimientos se sincronizan solo si el producto tiene ID numérico del backend
+- Productos del catálogo web se obtienen directamente del backend y se pueden agregar al inventario local
 
 ---
 
@@ -125,6 +126,18 @@ La app funciona con un enfoque **offline-first**, es decir, guarda todo localmen
 
 **Base URL:** `http://localhost:8082/` (o `http://10.0.2.2:8082/` desde emulador)
 
+### API Externa (MockAPI)
+
+- `GET /productos` - Obtener productos externos
+- `GET /productos/{id}` - Obtener producto externo por ID
+- `POST /productos` - Crear producto externo
+- `PUT /productos/{id}` - Actualizar producto externo
+- `DELETE /productos/{id}` - Eliminar producto externo
+
+**Base URL:** `https://692c2805c829d464006eb028.mockapi.io/`
+
+**Nota:** La infraestructura para consumir MockAPI está configurada y lista. Actualmente el catálogo online consume productos directamente del backend propio.
+
 ---
 
 ## 📋 Pasos para Ejecutar el Proyecto
@@ -145,24 +158,27 @@ cd Clases-mobile
 
 ### 2. Iniciar los Microservicios Backend
 
-Abre **3 terminales** diferentes en la raíz del proyecto:
+Abre **3 terminales** diferentes y navega a la carpeta `backend` del proyecto en cada una:
 
 **Terminal 1 - User Service:**
 
 ```bash
-.\gradlew.bat :backend:user-service:bootRun
+cd backend
+.\gradlew.bat :user-service:bootRun
 ```
 
 **Terminal 2 - Products Service:**
 
 ```bash
-.\gradlew.bat :backend:products-service:bootRun
+cd backend
+.\gradlew.bat :products-service:bootRun
 ```
 
 **Terminal 3 - Inventory Service:**
 
 ```bash
-.\gradlew.bat :backend:inventory-service:bootRun
+cd backend
+.\gradlew.bat :inventory-service:bootRun
 ```
 
 Espera a que los 3 servicios estén corriendo. Verás mensajes como "Started UserApplication" cuando estén listos.
@@ -231,16 +247,25 @@ Hemos implementado pruebas unitarias que cubren más del 80% del código lógico
 ```
 Clases-mobile/
 ├── app/                          # App móvil Android
-│   ├── src/main/java/.../
-│   │   ├── data/                 # Capa de datos
-│   │   │   ├── local/           # Room Database
-│   │   │   ├── remote/          # APIs Retrofit
-│   │   │   ├── repository/      # Repositorios
-│   │   │   └── mapper/          # Mappers de datos
-│   │   ├── domain/              # Modelos de dominio
-│   │   ├── ui/                  # UI con Compose
-│   │   │   └── viewmodel/       # ViewModels MVVM
-│   │   └── util/                # Utilidades
+│   ├── src/main/java/com/example/appmovil/
+│   │   ├── data/                 # Capa de datos (MVVM)
+│   │   │   └── local/           
+│   │   │       ├── entity/      # Entidades Room (Producto)
+│   │   │       ├── dao/         # Data Access Objects (ProductoDao)
+│   │   │       └── AppDatabase.kt
+│   │   ├── ui/                  # Capa de UI (MVVM)
+│   │   │   ├── activities/      # Activities de Android
+│   │   │   │   ├── LoginActivity.kt
+│   │   │   │   ├── HomeActivity.kt
+│   │   │   │   ├── ProductosActivity.kt
+│   │   │   │   ├── ConsultaActivity.kt
+│   │   │   │   ├── IngresoActivity.kt
+│   │   │   │   └── DetalleProductoActivity.kt
+│   │   │   ├── viewmodel/       # ViewModels MVVM
+│   │   │   │   ├── LoginViewModel.kt
+│   │   │   │   └── ProductoViewModel.kt
+│   │   │   └── theme/           # Temas y estilos
+│   │   └── ...
 │   └── src/test/                # Pruebas unitarias
 │
 └── backend/                      # Microservicios Spring Boot
@@ -285,6 +310,7 @@ Clases-mobile/
 - Si usas emulador: las URLs usan `10.0.2.2` que es el localhost del host
 - Si usas dispositivo físico: cambia las URLs a la IP de tu PC en `RetrofitClient.kt`
 - Verifica que el dispositivo y la PC estén en la misma red WiFi
+- La app está configurada para permitir tráfico HTTP (cleartext) al backend local mediante `network_security_config.xml`
 
 ### Las imágenes no cargan
 
@@ -296,21 +322,31 @@ Clases-mobile/
 
 ## 📝 Notas Importantes
 
-- Los productos con prefijo "EXT-" son importados del catálogo web y no se sincronizan con el backend al editar
-- Los productos normales se sincronizan completamente
-- Los movimientos siempre se sincronizan, incluso para productos "EXT-*"
+- Los productos creados manualmente obtienen IDs locales secuenciales: "PROD-1", "PROD-2", etc.
+- Los productos PROD-X se sincronizan con el backend y obtienen un ID numérico automático
+- El catálogo online muestra productos directamente del backend (Products Service)
+- Los movimientos se sincronizan solo si el producto asociado tiene un ID numérico del backend
 - El backend crea automáticamente 5 productos de ejemplo al iniciar el Products Service
+- La app usa `network_security_config.xml` para permitir comunicación HTTP con el backend local
 
 ---
 
 ## 👨‍💻 Desarrollo
 
-Este proyecto fue desarrollado como parte de la **Evaluación Parcial 3** del curso de Desarrollo de Aplicaciones Móviles (DSY1105).
+Este proyecto fue desarrollado como parte de la **Evaluación Parcial 4** del curso de Desarrollo de Aplicaciones Móviles (DSY1105).
 
 ### Cobertura de Pruebas
 
 - Más del 80% del código lógico está cubierto por pruebas unitarias
 - Pruebas implementadas con JUnit 5, Kotest y MockK
+
+### APK Firmado
+
+- **APK Release Firmado:** `app/build/outputs/apk/release/app-release.apk`
+- **Keystore:** `app/app-release-key.jks` (configurado en `keystore.properties`)
+- **Configuración:** El archivo `build.gradle.kts` está configurado para firmar automáticamente el APK release
+- **Para generar el APK:** Ejecutar `.\gradlew.bat assembleRelease`
+- **Nota:** El archivo `keystore.properties` y el `.jks` no se suben al repositorio por seguridad (están en `.gitignore`)
 
 ### Colaboración
 

@@ -5,6 +5,17 @@ plugins {
     kotlin("kapt")
 }
 
+import java.util.Properties
+
+// Cargar propiedades del keystore
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use {
+        keystoreProperties.load(it)
+    }
+}
+
 android {
     namespace = "com.example.appmovil"
     compileSdk = 36
@@ -19,6 +30,18 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                val storeFilePath = keystoreProperties.getProperty("storeFile")
+                storeFile = file("${rootProject.projectDir}/${storeFilePath}")
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -26,6 +49,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -64,7 +88,25 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity)
     
+    // Retrofit for API calls
+    implementation(libs.retrofit)
+    implementation("com.squareup.retrofit2:converter-gson:${libs.versions.retrofit.get()}")
+    implementation(libs.gson)
+    implementation(libs.okhttp)
+    implementation("com.squareup.okhttp3:logging-interceptor:${libs.versions.okhttp.get()}")
+    
+    // Coil for image loading
+    implementation("io.coil-kt:coil-compose:${libs.versions.coil.get()}")
+    
+    // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.junit5)
+    testImplementation("io.kotest:kotest-runner-junit5:${libs.versions.kotest.get()}")
+    testImplementation("io.kotest:kotest-assertions-core:${libs.versions.kotest.get()}")
+    testImplementation(libs.mockk)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${libs.versions.coroutinesTest.get()}")
+    testImplementation("androidx.arch.core:core-testing:${libs.versions.archCoreTesting.get()}")
+    
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
