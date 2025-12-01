@@ -1,4 +1,4 @@
-package com.pazapp.products.model;
+package com.pazapp.users.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,7 +1,7 @@
-package com.pazapp.products.service;
+package com.pazapp.inventory.service;
 
-import com.pazapp.products.model.Producto;
-import com.pazapp.products.repository.ProductoRepository;
+import com.pazapp.inventory.model.Producto;
+import com.pazapp.inventory.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

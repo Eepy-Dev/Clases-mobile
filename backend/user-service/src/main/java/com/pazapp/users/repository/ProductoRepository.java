@@ -1,6 +1,6 @@
-package com.pazapp.products.repository;
+package com.pazapp.users.repository;
 
-import com.pazapp.products.model.Producto;
+import com.pazapp.users.model.Producto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

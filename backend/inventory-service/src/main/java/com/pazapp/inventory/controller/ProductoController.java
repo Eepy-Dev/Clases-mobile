@@ -1,7 +1,7 @@
-package com.pazapp.products.controller;
+package com.pazapp.inventory.controller;
 
-import com.pazapp.products.model.Producto;
-import com.pazapp.products.service.ProductoService;
+import com.pazapp.inventory.model.Producto;
+import com.pazapp.inventory.service.ProductoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
