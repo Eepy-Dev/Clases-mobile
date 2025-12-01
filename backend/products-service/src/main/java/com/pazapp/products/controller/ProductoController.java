@@ -78,7 +78,7 @@ public class ProductoController {
             Integer cantidad = Integer.valueOf(payload.get("cantidad").toString());
             Producto producto = productoService.registrarSalida(java.util.Objects.requireNonNull(id), cantidad);
             return ResponseEntity.ok(producto);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }

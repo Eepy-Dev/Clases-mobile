@@ -22,7 +22,8 @@ public class MovimientoInventarioService {
         return repository.findByProductoId(productoId);
     }
 
+    @SuppressWarnings("null")
     public MovimientoInventario save(MovimientoInventario movimiento) {
-        return java.util.Objects.requireNonNull(repository.save(movimiento));
+        return repository.save(movimiento);
     }
 }
