@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AppMovil" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/chocolate_medium</item>
+        <item name="colorPrimaryDark">@color/chocolate_dark</item>
+        <item name="colorAccent">@color/chocolate_light</item>
+        <item name="android:windowBackground">@color/cream</item>
+        <item name="android:textColorPrimary">@color/chocolate_dark</item>
+        <item name="android:textColorSecondary">@color/chocolate_medium</item>
+    </style>
+</resources>
