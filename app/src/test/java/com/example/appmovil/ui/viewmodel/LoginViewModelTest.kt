@@ -24,7 +24,7 @@ class LoginViewModelTest {
         viewModel.validarLogin("", "admin")
         
         viewModel.loginResult.value shouldBe false
-        viewModel.errorMessage.value shouldBe "El campo usuario no puede estar vacío"
+        viewModel.errorUsuario.value shouldBe "El campo usuario no puede estar vacío"
     }
     
     @Test
@@ -32,7 +32,7 @@ class LoginViewModelTest {
         viewModel.validarLogin("admin", "")
         
         viewModel.loginResult.value shouldBe false
-        viewModel.errorMessage.value shouldBe "El campo contraseña no puede estar vacío"
+        viewModel.errorContrasena.value shouldBe "El campo contraseña no puede estar vacío"
     }
     
     @Test
@@ -40,7 +40,8 @@ class LoginViewModelTest {
         viewModel.validarLogin("admin", "admin")
         
         viewModel.loginResult.value shouldBe true
-        viewModel.errorMessage.value shouldBe null
+        viewModel.errorUsuario.value shouldBe ""
+        viewModel.errorContrasena.value shouldBe ""
     }
     
     @Test
@@ -48,7 +49,7 @@ class LoginViewModelTest {
         viewModel.validarLogin("admin", "wrong")
         
         viewModel.loginResult.value shouldBe false
-        viewModel.errorMessage.value shouldBe "Usuario o contraseña incorrectos"
+        viewModel.errorContrasena.value shouldBe "Usuario o contraseña incorrectos"
     }
 }
 
