@@ -1,8 +1,5 @@
 package com.example.appmovil.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.core.*
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.*
@@ -11,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.example.appmovil.ui.viewmodel.ProductViewModel
 import com.example.appmovil.ui.components.ChocoButton
 
@@ -22,12 +18,6 @@ fun MenuScreen(
     onNavigateToSalida: () -> Unit,
     viewModel: ProductViewModel
 ) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
-
     val userRole by viewModel.userRole.collectAsState()
 
     Column(
@@ -37,57 +27,49 @@ fun MenuScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AnimatedVisibility(
-            visible = isVisible,
-            enter = fadeIn() + slideInVertically()
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Logo (using the same resource as Login for now, assuming it's the ChocoApp logo)
-                val infiniteTransition = rememberInfiniteTransition(label = "logoInfinite")
-                val scale by infiniteTransition.animateFloat(
-                    initialValue = 1f,
-                    targetValue = 1.05f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(2000),
-                        repeatMode = RepeatMode.Reverse
-                    ),
-                    label = "logoScale"
-                )
+        // Logo (using the same resource as Login for now, assuming it's the ChocoApp logo)
+        val infiniteTransition = rememberInfiniteTransition(label = "logoInfinite")
+        val scale by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.05f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(2000),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "logoScale"
+        )
 
-                androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(id = com.example.appmovil.R.drawable.logo),
-                    contentDescription = "Logo Choco App",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                        }
-                )
-                
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Only Admin can delete/adjust stock (Salida)
-                if (userRole == "ADMIN") {
-                    ChocoButton(text = "Salida", onClick = onNavigateToSalida)
-                    Spacer(modifier = Modifier.height(16.dp))
+        androidx.compose.foundation.Image(
+            painter = androidx.compose.ui.res.painterResource(id = com.example.appmovil.R.drawable.logo),
+            contentDescription = "Logo Choco App",
+            modifier = Modifier
+                .size(200.dp)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
                 }
+        )
+        
+        Spacer(modifier = Modifier.height(32.dp))
 
-                ChocoButton(text = "Consulta", onClick = onNavigateToConsulta)
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Only Admin can create products (Ingreso)
-                if (userRole == "ADMIN") {
-                    ChocoButton(text = "Ingreso", onClick = onNavigateToIngreso)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-                
-                ChocoButton(text = "Historial", onClick = { /* TODO: Implement Historial */ })
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                ChocoButton(text = "Catálogo Online", onClick = { /* TODO: Implement Catalog */ })
-            }
+        // Only Admin can delete/adjust stock (Salida)
+        if (userRole == "ADMIN") {
+            ChocoButton(text = "Salida", onClick = onNavigateToSalida)
+            Spacer(modifier = Modifier.height(16.dp))
         }
+
+        ChocoButton(text = "Consulta", onClick = onNavigateToConsulta)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Only Admin can create products (Ingreso)
+        if (userRole == "ADMIN") {
+            ChocoButton(text = "Ingreso", onClick = onNavigateToIngreso)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        
+        ChocoButton(text = "Historial", onClick = { /* TODO: Implement Historial */ })
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        ChocoButton(text = "Catálogo Online", onClick = { /* TODO: Implement Catalog */ })
     }
 }
-
