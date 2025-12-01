@@ -1,12 +1,13 @@
 package com.pazapp.users.service;
 
-import com.pazapp.users.model.Usuario;
-import com.pazapp.users.repository.UsuarioRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.pazapp.users.model.Usuario;
+import com.pazapp.users.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
@@ -19,7 +20,7 @@ public class UsuarioService {
     }
 
     public Optional<Usuario> findById(Long id) {
-        return repository.findById(id);
+        return repository.findById(java.util.Objects.requireNonNull(id));
     }
 
     public Optional<Usuario> findByUsername(String username) {
@@ -27,7 +28,7 @@ public class UsuarioService {
     }
 
     public Usuario save(Usuario usuario) {
-        return repository.save(usuario);
+        return repository.save(java.util.Objects.requireNonNull(usuario));
     }
 
     public boolean validarCredenciales(String username, String password) {

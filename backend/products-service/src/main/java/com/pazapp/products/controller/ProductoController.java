@@ -1,14 +1,24 @@
 package com.pazapp.products.controller;
 
-import com.pazapp.products.model.Producto;
-import com.pazapp.products.service.ProductoService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pazapp.products.model.Producto;
+import com.pazapp.products.service.ProductoService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/productos")
@@ -24,19 +34,19 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Producto> getById(@PathVariable Long id) {
-        return productoService.findById(id)
+        return productoService.findById(java.util.Objects.requireNonNull(id))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public Producto create(@Valid @RequestBody Producto producto) {
-        return productoService.save(producto);
+        return productoService.save(java.util.Objects.requireNonNull(producto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Producto> update(@PathVariable Long id, @Valid @RequestBody Producto productoDetails) {
-        return productoService.findById(id)
+        return productoService.findById(java.util.Objects.requireNonNull(id))
                 .map(producto -> {
                     producto.setNombre(productoDetails.getNombre());
                     producto.setPrecio(productoDetails.getPrecio());
@@ -49,8 +59,8 @@ public class ProductoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (productoService.findById(id).isPresent()) {
-            productoService.deleteById(id);
+        if (productoService.findById(java.util.Objects.requireNonNull(id)).isPresent()) {
+            productoService.deleteById(java.util.Objects.requireNonNull(id));
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
@@ -66,7 +76,7 @@ public class ProductoController {
         try {
             Long id = Long.valueOf(payload.get("id").toString());
             Integer cantidad = Integer.valueOf(payload.get("cantidad").toString());
-            Producto producto = productoService.registrarSalida(id, cantidad);
+            Producto producto = productoService.registrarSalida(java.util.Objects.requireNonNull(id), cantidad);
             return ResponseEntity.ok(producto);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

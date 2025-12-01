@@ -1,11 +1,12 @@
 package com.pazapp.inventory.service;
 
-import com.pazapp.inventory.model.MovimientoInventario;
-import com.pazapp.inventory.repository.MovimientoInventarioRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.pazapp.inventory.model.MovimientoInventario;
+import com.pazapp.inventory.repository.MovimientoInventarioRepository;
 
 @Service
 public class MovimientoInventarioService {
@@ -22,6 +23,6 @@ public class MovimientoInventarioService {
     }
 
     public MovimientoInventario save(MovimientoInventario movimiento) {
-        return repository.save(movimiento);
+        return java.util.Objects.requireNonNull(repository.save(movimiento));
     }
 }

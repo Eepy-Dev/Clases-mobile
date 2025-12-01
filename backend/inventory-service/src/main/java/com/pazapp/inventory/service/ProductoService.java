@@ -1,12 +1,13 @@
 package com.pazapp.inventory.service;
 
-import com.pazapp.inventory.model.Producto;
-import com.pazapp.inventory.repository.ProductoRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.pazapp.inventory.model.Producto;
+import com.pazapp.inventory.repository.ProductoRepository;
 
 @Service
 public class ProductoService {
@@ -19,15 +20,15 @@ public class ProductoService {
     }
 
     public Optional<Producto> findById(Long id) {
-        return productoRepository.findById(id);
+        return productoRepository.findById(java.util.Objects.requireNonNull(id));
     }
 
     public Producto save(Producto producto) {
-        return productoRepository.save(producto);
+        return productoRepository.save(java.util.Objects.requireNonNull(producto));
     }
 
     public void deleteById(Long id) {
-        productoRepository.deleteById(id);
+        productoRepository.deleteById(java.util.Objects.requireNonNull(id));
     }
 
     public List<Producto> buscarPorNombre(String nombre) {
@@ -35,7 +36,7 @@ public class ProductoService {
     }
 
     public Producto registrarSalida(Long id, Integer cantidad) {
-        Producto producto = productoRepository.findById(id)
+        Producto producto = productoRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
         if (cantidad <= 0) {
