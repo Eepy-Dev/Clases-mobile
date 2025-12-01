@@ -9,5 +9,6 @@ data class DeletedProductEntity(
     val originalId: Long,
     val nombre: String,
     val precio: Double,
+    val imagenUrl: String? = null,
     val deletedAt: Long = System.currentTimeMillis()
 )

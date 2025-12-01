@@ -98,6 +98,9 @@ fun AppNavigation(
         composable(Screen.Catalog.route) {
             CatalogScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToDetail = { productId ->
+                    navController.navigate(Screen.Detail.createRoute(productId))
+                },
                 viewModel = productViewModel
             )
         }

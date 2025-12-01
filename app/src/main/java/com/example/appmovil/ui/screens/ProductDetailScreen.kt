@@ -28,7 +28,12 @@ fun ProductDetailScreen(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val product = uiState.products.find { it.id == productId } ?: uiState.selectedProduct
+    
+    LaunchedEffect(productId) {
+        viewModel.getProductById(productId)
+    }
+    
+    val product = uiState.selectedProduct
     val context = LocalContext.current
 
     Scaffold(

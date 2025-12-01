@@ -7,7 +7,7 @@ import com.example.appmovil.data.local.entity.DeletedProductEntity
 import com.example.appmovil.data.local.dao.ProductDao
 import com.example.appmovil.data.local.entity.ProductEntity
 
-@Database(entities = [ProductEntity::class, DeletedProductEntity::class], version = 2, exportSchema = false)
+@Database(entities = [ProductEntity::class, DeletedProductEntity::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun deletedProductDao(): DeletedProductDao

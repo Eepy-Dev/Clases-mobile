@@ -82,7 +82,11 @@ fun LoginScreen(
                             scaleY = scale
                         }
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+                com.example.appmovil.ui.components.AnimatedSpeechBubble(
+                    message = "Se me antoja un chocolatito y a ti?"
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = username,
@@ -119,7 +123,20 @@ fun LoginScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                TextButton(onClick = { /* TODO: Implement Forgot Password */ }) {
+                val context = androidx.compose.ui.platform.LocalContext.current
+                TextButton(onClick = {
+                    val phoneNumber = "+56912345678" // Número de soporte inventado
+                    val message = "Hola, olvidé mi contraseña de ChocoApp. Solicito ayuda para recuperarla."
+                    val url = "https://api.whatsapp.com/send?phone=$phoneNumber&text=${java.net.URLEncoder.encode(message, "UTF-8")}"
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
+                    intent.data = android.net.Uri.parse(url)
+                    try {
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        // Fallback if no browser or WhatsApp
+                        android.widget.Toast.makeText(context, "No se pudo abrir WhatsApp", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                }) {
                     Text("Olvidé mi contraseña")
                 }
             }

@@ -54,24 +54,59 @@ fun MenuScreen(
         
         Spacer(modifier = Modifier.height(32.dp))
 
+        var buttonsVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            buttonsVisible = true
+        }
+
         // Only Admin can delete/adjust stock (Salida)
         if (userRole == "ADMIN") {
-            ChocoButton(text = "Salida", onClick = onNavigateToSalida)
+            androidx.compose.animation.AnimatedVisibility(
+                visible = buttonsVisible,
+                enter = androidx.compose.animation.slideInVertically(initialOffsetY = { 50 }) + androidx.compose.animation.fadeIn(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ChocoButton(text = "Salida", onClick = onNavigateToSalida)
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        ChocoButton(text = "Consulta", onClick = onNavigateToConsulta)
+        androidx.compose.animation.AnimatedVisibility(
+            visible = buttonsVisible,
+            enter = androidx.compose.animation.slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(durationMillis = 300, delayMillis = 100)) + androidx.compose.animation.fadeIn(animationSpec = tween(delayMillis = 100)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ChocoButton(text = "Consulta", onClick = onNavigateToConsulta)
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
         // Only Admin can create products (Ingreso)
         if (userRole == "ADMIN") {
-            ChocoButton(text = "Ingreso", onClick = onNavigateToIngreso)
+            androidx.compose.animation.AnimatedVisibility(
+                visible = buttonsVisible,
+                enter = androidx.compose.animation.slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(durationMillis = 300, delayMillis = 200)) + androidx.compose.animation.fadeIn(animationSpec = tween(delayMillis = 200)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ChocoButton(text = "Ingreso", onClick = onNavigateToIngreso)
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
         
-        ChocoButton(text = "Historial", onClick = onNavigateToHistory)
+        androidx.compose.animation.AnimatedVisibility(
+            visible = buttonsVisible,
+            enter = androidx.compose.animation.slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(durationMillis = 300, delayMillis = 300)) + androidx.compose.animation.fadeIn(animationSpec = tween(delayMillis = 300)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ChocoButton(text = "Historial", onClick = onNavigateToHistory)
+        }
         Spacer(modifier = Modifier.height(16.dp))
         
-        ChocoButton(text = "Catálogo Online", onClick = onNavigateToCatalog)
+        androidx.compose.animation.AnimatedVisibility(
+            visible = buttonsVisible,
+            enter = androidx.compose.animation.slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(durationMillis = 300, delayMillis = 400)) + androidx.compose.animation.fadeIn(animationSpec = tween(delayMillis = 400)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ChocoButton(text = "Catálogo Online", onClick = onNavigateToCatalog)
+        }
     }
 }

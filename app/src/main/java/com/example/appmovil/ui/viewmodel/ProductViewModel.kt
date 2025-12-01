@@ -150,5 +150,17 @@ class ProductViewModel(
             }
         }
     }
+
+    fun getProductById(id: Long) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            val result = repository.getProductById(id)
+            result.onSuccess { product ->
+                _uiState.value = _uiState.value.copy(selectedProduct = product, isLoading = false)
+            }.onFailure { e ->
+                _uiState.value = _uiState.value.copy(error = e.message, isLoading = false)
+            }
+        }
+    }
 }
 

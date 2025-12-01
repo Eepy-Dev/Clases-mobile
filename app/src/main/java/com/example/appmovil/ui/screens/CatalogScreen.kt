@@ -1,13 +1,19 @@
 package com.example.appmovil.ui.screens
 
+import android.content.Intent
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.appmovil.domain.model.Product
@@ -16,7 +22,8 @@ import com.example.appmovil.ui.viewmodel.ProductViewModel
 @Composable
 fun CatalogScreen(
     viewModel: ProductViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToDetail: (Long) -> Unit
 ) {
     var catalogProducts by remember { mutableStateOf<List<Product>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -48,7 +55,10 @@ fun CatalogScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(catalogProducts) { product ->
-                    CatalogItem(product)
+                    CatalogItem(
+                        product = product,
+                        onClick = { onNavigateToDetail(product.id ?: 0L) }
+                    )
                 }
             }
         }
@@ -61,10 +71,14 @@ fun CatalogScreen(
 }
 
 @Composable
-fun CatalogItem(product: Product) {
+fun CatalogItem(product: Product, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface) // Beige/Cream
     ) {
         Row(
             modifier = Modifier
@@ -76,13 +90,34 @@ fun CatalogItem(product: Product) {
                 model = product.imagenUrl,
                 contentDescription = product.nombre,
                 modifier = Modifier.size(80.dp),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                error = androidx.compose.ui.res.painterResource(id = com.example.appmovil.R.drawable.logo) // Fallback to logo
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(text = product.nombre, style = MaterialTheme.typography.titleMedium)
-                Text(text = "$${product.precio.toInt()}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Stock: ${product.stock}", style = MaterialTheme.typography.bodySmall)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = product.nombre, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text(text = "$${product.precio.toInt()}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text(text = "Stock: ${product.stock}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            IconButton(onClick = {
+                val message = "¡Mira este producto en ChocoApp!\n\n*${product.nombre}*\nPrecio: $${product.precio}\nStock: ${product.stock}\n\n${product.imagenUrl ?: ""}"
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, message)
+                    setPackage("com.whatsapp")
+                }
+                try {
+                    context.startActivity(intent)
+                } catch (e: Exception) {
+                    Toast.makeText(context, "WhatsApp no instalado, abriendo selector...", Toast.LENGTH_SHORT).show()
+                    val shareIntent = Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, message)
+                    }, "Compartir vía")
+                    context.startActivity(shareIntent)
+                }
+            }) {
+                Icon(Icons.Default.Share, contentDescription = "Compartir", tint = MaterialTheme.colorScheme.primary)
             }
         }
     }

@@ -69,6 +69,24 @@ class ProductRepository(
     }
 
     suspend fun getProductById(id: Long): Result<Product> = withContext(Dispatchers.IO) {
+        // Check if it's a mock product from the online catalog
+        val mockCatalog = listOf(
+            Product(id = 101, nombre = "Torta de Chocolate", precio = 15000.0, stock = 10, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.torta_chocolate_v2}"),
+            Product(id = 102, nombre = "Galletas de Almendra", precio = 5000.0, stock = 20, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.galletas_almendra_v2}"),
+            Product(id = 103, nombre = "Trufas de Chocolate", precio = 8000.0, stock = 15, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.trufas_chocolate_v2}"),
+            Product(id = 104, nombre = "Pie de Limón", precio = 12000.0, stock = 5, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.pie_limon_v2}"),
+            Product(id = 105, nombre = "Cupcakes Red Velvet", precio = 2500.0, stock = 30, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cupcakes_red_velvet_v2}"),
+            Product(id = 106, nombre = "Brownie con Nuez", precio = 3000.0, stock = 25, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.brownie_v2}"),
+            Product(id = 107, nombre = "Tarta de Frutilla", precio = 14000.0, stock = 8, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.tarta_frutilla_v2}"),
+            Product(id = 108, nombre = "Alfajores Artesanales", precio = 1500.0, stock = 50, imagenUrl = "https://placehold.co/600x400?text=Alfajores"),
+            Product(id = 109, nombre = "Macarons Surtidos", precio = 10000.0, stock = 12, imagenUrl = "https://placehold.co/600x400?text=Macarons"),
+            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cheesecake_frambuesa}")
+        )
+        val mockProduct = mockCatalog.find { it.id == id }
+        if (mockProduct != null) {
+            return@withContext Result.success(mockProduct)
+        }
+
         try {
             val response = api.getProductById(id)
             if (response.isSuccessful && response.body() != null) {
@@ -130,7 +148,8 @@ class ProductRepository(
                         com.example.appmovil.data.local.entity.DeletedProductEntity(
                             originalId = product.id ?: 0L,
                             nombre = product.nombre,
-                            precio = product.precio
+                            precio = product.precio,
+                            imagenUrl = product.imagenUrl
                         )
                     )
                 }
@@ -161,16 +180,16 @@ class ProductRepository(
     suspend fun getOnlineCatalog(): Result<List<Product>> = withContext(Dispatchers.IO) {
         // Mock data for "Catálogo Online"
         val mockCatalog = listOf(
-            Product(id = 101, nombre = "Torta de Chocolate", precio = 15000.0, stock = 10, imagenUrl = "https://example.com/torta.jpg"),
-            Product(id = 102, nombre = "Galletas de Almendra", precio = 5000.0, stock = 20, imagenUrl = "https://example.com/galletas.jpg"),
-            Product(id = 103, nombre = "Trufas de Chocolate", precio = 8000.0, stock = 15, imagenUrl = "https://example.com/trufas.jpg"),
-            Product(id = 104, nombre = "Pie de Limón", precio = 12000.0, stock = 5, imagenUrl = "https://example.com/pie.jpg"),
-            Product(id = 105, nombre = "Cupcakes Red Velvet", precio = 2500.0, stock = 30, imagenUrl = "https://example.com/cupcakes.jpg"),
-            Product(id = 106, nombre = "Brownie con Nuez", precio = 3000.0, stock = 25, imagenUrl = "https://example.com/brownie.jpg"),
-            Product(id = 107, nombre = "Tarta de Frutilla", precio = 14000.0, stock = 8, imagenUrl = "https://example.com/tarta.jpg"),
-            Product(id = 108, nombre = "Alfajores Artesanales", precio = 1500.0, stock = 50, imagenUrl = "https://example.com/alfajores.jpg"),
-            Product(id = 109, nombre = "Macarons Surtidos", precio = 10000.0, stock = 12, imagenUrl = "https://example.com/macarons.jpg"),
-            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "https://example.com/cheesecake.jpg")
+            Product(id = 101, nombre = "Torta de Chocolate", precio = 15000.0, stock = 10, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.torta_chocolate_v2}"),
+            Product(id = 102, nombre = "Galletas de Almendra", precio = 5000.0, stock = 20, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.galletas_almendra_v2}"),
+            Product(id = 103, nombre = "Trufas de Chocolate", precio = 8000.0, stock = 15, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.trufas_chocolate_v2}"),
+            Product(id = 104, nombre = "Pie de Limón", precio = 12000.0, stock = 5, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.pie_limon_v2}"),
+            Product(id = 105, nombre = "Cupcakes Red Velvet", precio = 2500.0, stock = 30, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cupcakes_red_velvet_v2}"),
+            Product(id = 106, nombre = "Brownie con Nuez", precio = 3000.0, stock = 25, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.brownie_v2}"),
+            Product(id = 107, nombre = "Tarta de Frutilla", precio = 14000.0, stock = 8, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.tarta_frutilla_v2}"),
+            Product(id = 108, nombre = "Alfajores Artesanales", precio = 1500.0, stock = 50, imagenUrl = "https://placehold.co/600x400?text=Alfajores"),
+            Product(id = 109, nombre = "Macarons Surtidos", precio = 10000.0, stock = 12, imagenUrl = "https://placehold.co/600x400?text=Macarons"),
+            Product(id = 110, nombre = "Cheesecake de Frambuesa", precio = 18000.0, stock = 6, imagenUrl = "android.resource://com.example.appmovil/${com.example.appmovil.R.drawable.cheesecake_frambuesa}")
         )
         Result.success(mockCatalog)
     }
@@ -254,7 +273,4 @@ class ProductRepository(
             Result.failure(e)
         }
     }
-
-
 }
-
