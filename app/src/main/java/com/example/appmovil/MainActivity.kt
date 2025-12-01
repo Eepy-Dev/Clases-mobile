@@ -11,22 +11,6 @@ import com.example.appmovil.data.local.AppDatabase
 import com.example.appmovil.data.repository.ProductRepository
 import com.example.appmovil.ui.navigation.AppNavigation
 import com.example.appmovil.ui.theme.AppMovilTheme
-import com.example.appmovil.ui.viewmodel.ProductViewModel
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "app-database"
-        ).build()
-        
-        val repository = ProductRepository(
-            productDao = db.productDao(),
-            deletedProductDao = db.deletedProductDao()
-        )
-        val userPreferencesRepository = com.example.appmovil.data.local.UserPreferencesRepository(applicationContext)
         
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
