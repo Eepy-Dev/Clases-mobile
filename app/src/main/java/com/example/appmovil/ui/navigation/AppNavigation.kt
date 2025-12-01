@@ -21,7 +21,7 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
-    productViewModel: ProductViewModel = viewModel(),
+    productViewModel: ProductViewModel,
     loginViewModel: LoginViewModel = viewModel()
 ) {
     NavHost(navController = navController, startDestination = Screen.Login.route) {
